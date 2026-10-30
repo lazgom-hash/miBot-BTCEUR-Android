@@ -211,8 +211,8 @@ def run_bot(ts,rows,fx_daily,quote):
     end=datetime.fromtimestamp(int(ts[-1]),timezone.utc)
     while dt.year<end.year or (dt.year==end.year and dt.month<=end.month):
         allmonths.append(dt.strftime('%Y-%m'));dt=dt.replace(year=dt.year+1,month=1) if dt.month==12 else dt.replace(month=dt.month+1)
-    positive_months=sum(monthprof.get(m,0)>0 for m in allmonths)
-    paid_months=sum(monthpersonal.get(m,0)>0 for m in allmonths)
+    positive_months=int(sum(monthprof.get(m,0)>0 for m in allmonths))
+    paid_months=int(sum(monthpersonal.get(m,0)>0 for m in allmonths))
     longest_streak=0;current=0
     for m in allmonths:
         current=0 if monthprof.get(m,0)>0 else current+1
