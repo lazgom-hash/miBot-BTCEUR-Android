@@ -1,0 +1,684 @@
+{
+  "source": "OKX monthly candlestick original ZIP, 1 minute, both pairs same timestamps",
+  "currency": "All monetary amounts nominal USDC, no USD/EUR conversion",
+  "method": "Same copied miBot model, N15 CB0.5% MM1.2 MC1.2 TP gross1%; buy and sell fee0.1%; deposits 200 pre25K and 300 post OOR; post25K profit split 80/20",
+  "metadata": {
+    "start": "2024-10-31T16:00:00+00:00",
+    "end": "2026-09-30T15:59:00+00:00",
+    "common_candles": 213123,
+    "window_minutes": 1006560,
+    "missing_pct": 78.8266
+  },
+  "audit": {
+    "EURC-USDC": {
+      "2024-10": {
+        "rows": 43200,
+        "missing": false,
+        "url": "https://static.okx.com/cdn/okex/traderecords/candlesticks/monthly/202411/EURC-USDC-candlesticks-2024-11.zip?v=1001"
+      },
+      "2024-11": {
+        "rows": 44640,
+        "missing": false,
+        "url": "https://static.okx.com/cdn/okex/traderecords/candlesticks/monthly/202412/EURC-USDC-candlesticks-2024-12.zip?v=1001"
+      },
+      "2024-12": {
+        "rows": 44640,
+        "missing": false,
+        "url": "https://static.okx.com/cdn/okex/traderecords/candlesticks/monthly/202501/EURC-USDC-candlesticks-2025-01.zip?v=1001"
+      },
+      "2025-01": {
+        "rows": 40320,
+        "missing": false,
+        "url": "https://static.okx.com/cdn/okex/traderecords/candlesticks/monthly/202502/EURC-USDC-candlesticks-2025-02.zip?v=1001"
+      },
+      "2025-02": {
+        "rows": 26943,
+        "missing": false,
+        "url": "https://static.okx.com/cdn/okex/traderecords/candlesticks/monthly/202503/EURC-USDC-candlesticks-2025-03.zip?v=1001"
+      },
+      "2025-03": {
+        "rows": 26943,
+        "missing": false,
+        "url": "https://static.okx.com/cdn/okex/traderecords/candlesticks/monthly/202503/EURC-USDC-candlesticks-2025-03.zip?v=1001"
+      },
+      "2025-04": {
+        "rows": 0,
+        "missing": true,
+        "url": null
+      },
+      "2025-05": {
+        "rows": 0,
+        "missing": true,
+        "url": null
+      },
+      "2025-06": {
+        "rows": 0,
+        "missing": true,
+        "url": null
+      },
+      "2025-07": {
+        "rows": 0,
+        "missing": true,
+        "url": null
+      },
+      "2025-08": {
+        "rows": 0,
+        "missing": true,
+        "url": null
+      },
+      "2025-09": {
+        "rows": 0,
+        "missing": true,
+        "url": null
+      },
+      "2025-10": {
+        "rows": 0,
+        "missing": true,
+        "url": null
+      },
+      "2025-11": {
+        "rows": 0,
+        "missing": true,
+        "url": null
+      },
+      "2025-12": {
+        "rows": 0,
+        "missing": true,
+        "url": null
+      },
+      "2026-01": {
+        "rows": 0,
+        "missing": true,
+        "url": null
+      },
+      "2026-02": {
+        "rows": 0,
+        "missing": true,
+        "url": null
+      },
+      "2026-03": {
+        "rows": 0,
+        "missing": true,
+        "url": null
+      },
+      "2026-04": {
+        "rows": 0,
+        "missing": true,
+        "url": null
+      },
+      "2026-05": {
+        "rows": 0,
+        "missing": true,
+        "url": null
+      },
+      "2026-06": {
+        "rows": 0,
+        "missing": true,
+        "url": null
+      },
+      "2026-07": {
+        "rows": 0,
+        "missing": true,
+        "url": null
+      },
+      "2026-08": {
+        "rows": 13380,
+        "missing": false,
+        "url": "https://static.okx.com/cdn/okex/traderecords/candlesticks/monthly/202609/EURC-USDC-candlesticks-2026-09.zip?v=1001"
+      },
+      "2026-09": {
+        "rows": 13380,
+        "missing": false,
+        "url": "https://static.okx.com/cdn/okex/traderecords/candlesticks/monthly/202609/EURC-USDC-candlesticks-2026-09.zip?v=1001"
+      }
+    },
+    "BTC-USDC": {
+      "2024-10": {
+        "rows": 43200,
+        "missing": false,
+        "url": "https://static.okx.com/cdn/okex/traderecords/candlesticks/monthly/202411/BTC-USDC-candlesticks-2024-11.zip?v=1001"
+      },
+      "2024-11": {
+        "rows": 44640,
+        "missing": false,
+        "url": "https://static.okx.com/cdn/okex/traderecords/candlesticks/monthly/202412/BTC-USDC-candlesticks-2024-12.zip?v=1001"
+      },
+      "2024-12": {
+        "rows": 44640,
+        "missing": false,
+        "url": "https://static.okx.com/cdn/okex/traderecords/candlesticks/monthly/202501/BTC-USDC-candlesticks-2025-01.zip?v=1001"
+      },
+      "2025-01": {
+        "rows": 40320,
+        "missing": false,
+        "url": "https://static.okx.com/cdn/okex/traderecords/candlesticks/monthly/202502/BTC-USDC-candlesticks-2025-02.zip?v=1001"
+      },
+      "2025-02": {
+        "rows": 44640,
+        "missing": false,
+        "url": "https://static.okx.com/cdn/okex/traderecords/candlesticks/monthly/202503/BTC-USDC-candlesticks-2025-03.zip?v=1001"
+      },
+      "2025-03": {
+        "rows": 43200,
+        "missing": false,
+        "url": "https://static.okx.com/cdn/okex/traderecords/candlesticks/monthly/202504/BTC-USDC-candlesticks-2025-04.zip?v=1001"
+      },
+      "2025-04": {
+        "rows": 44640,
+        "missing": false,
+        "url": "https://static.okx.com/cdn/okex/traderecords/candlesticks/monthly/202505/BTC-USDC-candlesticks-2025-05.zip?v=1001"
+      },
+      "2025-05": {
+        "rows": 43200,
+        "missing": false,
+        "url": "https://static.okx.com/cdn/okex/traderecords/candlesticks/monthly/202506/BTC-USDC-candlesticks-2025-06.zip?v=1001"
+      },
+      "2025-06": {
+        "rows": 44640,
+        "missing": false,
+        "url": "https://static.okx.com/cdn/okex/traderecords/candlesticks/monthly/202507/BTC-USDC-candlesticks-2025-07.zip?v=1001"
+      },
+      "2025-07": {
+        "rows": 43372,
+        "missing": false,
+        "url": "https://static.okx.com/cdn/okex/traderecords/candlesticks/monthly/202508/BTC-USDC-candlesticks-2025-08.zip?v=1001"
+      },
+      "2025-08": {
+        "rows": 43200,
+        "missing": false,
+        "url": "https://static.okx.com/cdn/okex/traderecords/candlesticks/monthly/202509/BTC-USDC-candlesticks-2025-09.zip?v=1001"
+      },
+      "2025-09": {
+        "rows": 44640,
+        "missing": false,
+        "url": "https://static.okx.com/cdn/okex/traderecords/candlesticks/monthly/202510/BTC-USDC-candlesticks-2025-10.zip?v=1001"
+      },
+      "2025-10": {
+        "rows": 43200,
+        "missing": false,
+        "url": "https://static.okx.com/cdn/okex/traderecords/candlesticks/monthly/202511/BTC-USDC-candlesticks-2025-11.zip?v=1001"
+      },
+      "2025-11": {
+        "rows": 44640,
+        "missing": false,
+        "url": "https://static.okx.com/cdn/okex/traderecords/candlesticks/monthly/202512/BTC-USDC-candlesticks-2025-12.zip?v=1001"
+      },
+      "2025-12": {
+        "rows": 44640,
+        "missing": false,
+        "url": "https://static.okx.com/cdn/okex/traderecords/candlesticks/monthly/202601/BTC-USDC-candlesticks-2026-01.zip?v=1001"
+      },
+      "2026-01": {
+        "rows": 40320,
+        "missing": false,
+        "url": "https://static.okx.com/cdn/okex/traderecords/candlesticks/monthly/202602/BTC-USDC-candlesticks-2026-02.zip?v=1001"
+      },
+      "2026-02": {
+        "rows": 44640,
+        "missing": false,
+        "url": "https://static.okx.com/cdn/okex/traderecords/candlesticks/monthly/202603/BTC-USDC-candlesticks-2026-03.zip?v=1001"
+      },
+      "2026-03": {
+        "rows": 43200,
+        "missing": false,
+        "url": "https://static.okx.com/cdn/okex/traderecords/candlesticks/monthly/202604/BTC-USDC-candlesticks-2026-04.zip?v=1001"
+      },
+      "2026-04": {
+        "rows": 44640,
+        "missing": false,
+        "url": "https://static.okx.com/cdn/okex/traderecords/candlesticks/monthly/202605/BTC-USDC-candlesticks-2026-05.zip?v=1001"
+      },
+      "2026-05": {
+        "rows": 43200,
+        "missing": false,
+        "url": "https://static.okx.com/cdn/okex/traderecords/candlesticks/monthly/202606/BTC-USDC-candlesticks-2026-06.zip?v=1001"
+      },
+      "2026-06": {
+        "rows": 44640,
+        "missing": false,
+        "url": "https://static.okx.com/cdn/okex/traderecords/candlesticks/monthly/202607/BTC-USDC-candlesticks-2026-07.zip?v=1001"
+      },
+      "2026-07": {
+        "rows": 44640,
+        "missing": false,
+        "url": "https://static.okx.com/cdn/okex/traderecords/candlesticks/monthly/202608/BTC-USDC-candlesticks-2026-08.zip?v=1001"
+      },
+      "2026-08": {
+        "rows": 43200,
+        "missing": false,
+        "url": "https://static.okx.com/cdn/okex/traderecords/candlesticks/monthly/202609/BTC-USDC-candlesticks-2026-09.zip?v=1001"
+      },
+      "2026-09": {
+        "rows": 43200,
+        "missing": false,
+        "url": "https://static.okx.com/cdn/okex/traderecords/candlesticks/monthly/202609/BTC-USDC-candlesticks-2026-09.zip?v=1001"
+      }
+    }
+  },
+  "scenarios": {
+    "EURC-USDC": {
+      "market": "EURC-USDC",
+      "start_utc": "2024-10-31T16:00:00+00:00",
+      "end_utc": "2026-09-30T15:59:00+00:00",
+      "initial_eur": 15000,
+      "external_eur": 1200.0,
+      "personal_withdrawn_eur": 0.0,
+      "realized_bot_profit_eur": 63.5,
+      "equity_eur": 16259.95,
+      "net_wealth_gain_eur": 59.95,
+      "unrealized_pnl_eur": -3.55,
+      "cycles": 8,
+      "buy_orders": 33,
+      "months_profitable": 3,
+      "months_withdrawals": 0,
+      "months": 24,
+      "longest_no_profit_streak_months": 17,
+      "oor_entry_count": 0,
+      "longest_oor_days": 0.0,
+      "phase_change_utc": null,
+      "current_phase": "pre",
+      "last_cycle_close_utc": "2026-09-30T09:36:00+00:00",
+      "monthly": [
+        {
+          "month": "2024-10",
+          "profit_eur": 0,
+          "personal_eur": 0,
+          "cycles": 0,
+          "contributions_eur": 200.0
+        },
+        {
+          "month": "2024-11",
+          "profit_eur": 11.4,
+          "personal_eur": 0,
+          "cycles": 2,
+          "contributions_eur": 200.0
+        },
+        {
+          "month": "2024-12",
+          "profit_eur": 0,
+          "personal_eur": 0,
+          "cycles": 0,
+          "contributions_eur": 200.0
+        },
+        {
+          "month": "2025-01",
+          "profit_eur": 0,
+          "personal_eur": 0,
+          "cycles": 0,
+          "contributions_eur": 200.0
+        },
+        {
+          "month": "2025-02",
+          "profit_eur": 0,
+          "personal_eur": 0,
+          "cycles": 0,
+          "contributions_eur": 200.0
+        },
+        {
+          "month": "2025-03",
+          "profit_eur": 37.75,
+          "personal_eur": 0,
+          "cycles": 3,
+          "contributions_eur": 0
+        },
+        {
+          "month": "2025-04",
+          "profit_eur": 0,
+          "personal_eur": 0,
+          "cycles": 0,
+          "contributions_eur": 0
+        },
+        {
+          "month": "2025-05",
+          "profit_eur": 0,
+          "personal_eur": 0,
+          "cycles": 0,
+          "contributions_eur": 0
+        },
+        {
+          "month": "2025-06",
+          "profit_eur": 0,
+          "personal_eur": 0,
+          "cycles": 0,
+          "contributions_eur": 0
+        },
+        {
+          "month": "2025-07",
+          "profit_eur": 0,
+          "personal_eur": 0,
+          "cycles": 0,
+          "contributions_eur": 0
+        },
+        {
+          "month": "2025-08",
+          "profit_eur": 0,
+          "personal_eur": 0,
+          "cycles": 0,
+          "contributions_eur": 0
+        },
+        {
+          "month": "2025-09",
+          "profit_eur": 0,
+          "personal_eur": 0,
+          "cycles": 0,
+          "contributions_eur": 0
+        },
+        {
+          "month": "2025-10",
+          "profit_eur": 0,
+          "personal_eur": 0,
+          "cycles": 0,
+          "contributions_eur": 0
+        },
+        {
+          "month": "2025-11",
+          "profit_eur": 0,
+          "personal_eur": 0,
+          "cycles": 0,
+          "contributions_eur": 0
+        },
+        {
+          "month": "2025-12",
+          "profit_eur": 0,
+          "personal_eur": 0,
+          "cycles": 0,
+          "contributions_eur": 0
+        },
+        {
+          "month": "2026-01",
+          "profit_eur": 0,
+          "personal_eur": 0,
+          "cycles": 0,
+          "contributions_eur": 0
+        },
+        {
+          "month": "2026-02",
+          "profit_eur": 0,
+          "personal_eur": 0,
+          "cycles": 0,
+          "contributions_eur": 0
+        },
+        {
+          "month": "2026-03",
+          "profit_eur": 0,
+          "personal_eur": 0,
+          "cycles": 0,
+          "contributions_eur": 0
+        },
+        {
+          "month": "2026-04",
+          "profit_eur": 0,
+          "personal_eur": 0,
+          "cycles": 0,
+          "contributions_eur": 0
+        },
+        {
+          "month": "2026-05",
+          "profit_eur": 0,
+          "personal_eur": 0,
+          "cycles": 0,
+          "contributions_eur": 0
+        },
+        {
+          "month": "2026-06",
+          "profit_eur": 0,
+          "personal_eur": 0,
+          "cycles": 0,
+          "contributions_eur": 0
+        },
+        {
+          "month": "2026-07",
+          "profit_eur": 0,
+          "personal_eur": 0,
+          "cycles": 0,
+          "contributions_eur": 0
+        },
+        {
+          "month": "2026-08",
+          "profit_eur": 0,
+          "personal_eur": 0,
+          "cycles": 0,
+          "contributions_eur": 0
+        },
+        {
+          "month": "2026-09",
+          "profit_eur": 14.35,
+          "personal_eur": 0,
+          "cycles": 3,
+          "contributions_eur": 200.0
+        }
+      ],
+      "observed": {
+        "first_price": 1.0857,
+        "last_price": 1.133,
+        "low_observed": 1.0211,
+        "high_observed": 1.162,
+        "minute_abs_return_median_pct": 0.0,
+        "minute_abs_return_p99_pct": 0.09154130427694371,
+        "daily_close_vol_pct_annualized": 11.596831393652332,
+        "abnormal_5pct_candles": 0,
+        "missing_large_gaps": 1
+      }
+    },
+    "BTC-USDC": {
+      "market": "BTC-USDC",
+      "start_utc": "2024-10-31T16:00:00+00:00",
+      "end_utc": "2026-09-30T15:59:00+00:00",
+      "initial_eur": 15000,
+      "external_eur": 1200.0,
+      "personal_withdrawn_eur": 0.0,
+      "realized_bot_profit_eur": 1905.15,
+      "equity_eur": 18074.4,
+      "net_wealth_gain_eur": 1874.4,
+      "unrealized_pnl_eur": -30.75,
+      "cycles": 213,
+      "buy_orders": 671,
+      "months_profitable": 6,
+      "months_withdrawals": 0,
+      "months": 24,
+      "longest_no_profit_streak_months": 17,
+      "oor_entry_count": 0,
+      "longest_oor_days": 0.0,
+      "phase_change_utc": null,
+      "current_phase": "pre",
+      "last_cycle_close_utc": "2026-09-23T01:13:00+00:00",
+      "monthly": [
+        {
+          "month": "2024-10",
+          "profit_eur": 0,
+          "personal_eur": 0,
+          "cycles": 0,
+          "contributions_eur": 200.0
+        },
+        {
+          "month": "2024-11",
+          "profit_eur": 515.78,
+          "personal_eur": 0,
+          "cycles": 82,
+          "contributions_eur": 200.0
+        },
+        {
+          "month": "2024-12",
+          "profit_eur": 276.71,
+          "personal_eur": 0,
+          "cycles": 37,
+          "contributions_eur": 200.0
+        },
+        {
+          "month": "2025-01",
+          "profit_eur": 443.98,
+          "personal_eur": 0,
+          "cycles": 45,
+          "contributions_eur": 200.0
+        },
+        {
+          "month": "2025-02",
+          "profit_eur": 194.21,
+          "personal_eur": 0,
+          "cycles": 14,
+          "contributions_eur": 200.0
+        },
+        {
+          "month": "2025-03",
+          "profit_eur": 446.31,
+          "personal_eur": 0,
+          "cycles": 29,
+          "contributions_eur": 0
+        },
+        {
+          "month": "2025-04",
+          "profit_eur": 0,
+          "personal_eur": 0,
+          "cycles": 0,
+          "contributions_eur": 0
+        },
+        {
+          "month": "2025-05",
+          "profit_eur": 0,
+          "personal_eur": 0,
+          "cycles": 0,
+          "contributions_eur": 0
+        },
+        {
+          "month": "2025-06",
+          "profit_eur": 0,
+          "personal_eur": 0,
+          "cycles": 0,
+          "contributions_eur": 0
+        },
+        {
+          "month": "2025-07",
+          "profit_eur": 0,
+          "personal_eur": 0,
+          "cycles": 0,
+          "contributions_eur": 0
+        },
+        {
+          "month": "2025-08",
+          "profit_eur": 0,
+          "personal_eur": 0,
+          "cycles": 0,
+          "contributions_eur": 0
+        },
+        {
+          "month": "2025-09",
+          "profit_eur": 0,
+          "personal_eur": 0,
+          "cycles": 0,
+          "contributions_eur": 0
+        },
+        {
+          "month": "2025-10",
+          "profit_eur": 0,
+          "personal_eur": 0,
+          "cycles": 0,
+          "contributions_eur": 0
+        },
+        {
+          "month": "2025-11",
+          "profit_eur": 0,
+          "personal_eur": 0,
+          "cycles": 0,
+          "contributions_eur": 0
+        },
+        {
+          "month": "2025-12",
+          "profit_eur": 0,
+          "personal_eur": 0,
+          "cycles": 0,
+          "contributions_eur": 0
+        },
+        {
+          "month": "2026-01",
+          "profit_eur": 0,
+          "personal_eur": 0,
+          "cycles": 0,
+          "contributions_eur": 0
+        },
+        {
+          "month": "2026-02",
+          "profit_eur": 0,
+          "personal_eur": 0,
+          "cycles": 0,
+          "contributions_eur": 0
+        },
+        {
+          "month": "2026-03",
+          "profit_eur": 0,
+          "personal_eur": 0,
+          "cycles": 0,
+          "contributions_eur": 0
+        },
+        {
+          "month": "2026-04",
+          "profit_eur": 0,
+          "personal_eur": 0,
+          "cycles": 0,
+          "contributions_eur": 0
+        },
+        {
+          "month": "2026-05",
+          "profit_eur": 0,
+          "personal_eur": 0,
+          "cycles": 0,
+          "contributions_eur": 0
+        },
+        {
+          "month": "2026-06",
+          "profit_eur": 0,
+          "personal_eur": 0,
+          "cycles": 0,
+          "contributions_eur": 0
+        },
+        {
+          "month": "2026-07",
+          "profit_eur": 0,
+          "personal_eur": 0,
+          "cycles": 0,
+          "contributions_eur": 0
+        },
+        {
+          "month": "2026-08",
+          "profit_eur": 0,
+          "personal_eur": 0,
+          "cycles": 0,
+          "contributions_eur": 0
+        },
+        {
+          "month": "2026-09",
+          "profit_eur": 28.16,
+          "personal_eur": 0,
+          "cycles": 6,
+          "contributions_eur": 200.0
+        }
+      ],
+      "observed": {
+        "first_price": 70508.1,
+        "last_price": 84075.4,
+        "low_observed": 66789.7,
+        "high_observed": 109557.6,
+        "minute_abs_return_median_pct": 0.03328937761075679,
+        "minute_abs_return_p99_pct": 0.27354439455417007,
+        "daily_close_vol_pct_annualized": 52.01803368772631,
+        "abnormal_5pct_candles": 1,
+        "missing_large_gaps": 1
+      }
+    }
+  },
+  "difference_eurc_minus_btc": {
+    "net_wealth_gain_eur": -1814.45,
+    "personal_withdrawn_eur": 0.0,
+    "realized_bot_profit_eur": -1841.65,
+    "external_eur": 0.0,
+    "equity_eur": -1814.45,
+    "cycles": -205,
+    "months_withdrawals": 0,
+    "months_profitable": -3
+  },
+  "limitations": [
+    "OHLC fills assumed when touched, no maker queue/slippage/order book",
+    "Same 15K initial funding in USDC and no conversion to euros",
+    "EURC stablecoin peg and regulatory/redemption/liquidity risk not modeled",
+    "BTC bot and EURC bot have different economic risk even in same quote currency"
+  ]
+}
