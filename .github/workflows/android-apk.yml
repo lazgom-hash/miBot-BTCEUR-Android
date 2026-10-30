@@ -3,6 +3,10 @@ name: Compilar miBot BTC-EUR APK
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - 'comparador-okx/**'
+      - 'comparador-okx-source-*'
+      - '.github/workflows/okx-comparador.yml'
   workflow_dispatch:
 
 permissions:
