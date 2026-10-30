@@ -7,7 +7,7 @@ on:
       - '.github/workflows/okx-comparador.yml'
   workflow_dispatch:
   schedule:
-    - cron: '2,7,12,17,22,27,32,37,42,47,52,57 * * * *'
+    - cron: '*/5 * * * *'
 permissions:
   contents: write
 concurrency:
@@ -50,7 +50,15 @@ jobs:
           git add comparador-okx/data/
           if ! git diff --cached --quiet; then
             git commit -m "OKX: muestra pública de libros de órdenes [skip ci]"
-            git push origin HEAD:main
+            for i in 1 2 3; do
+              git pull --rebase origin main
+              if git push origin HEAD:main; then
+                exit 0
+              fi
+              sleep 3
+            done
+            echo 'No se pudo publicar la captura después de tres intentos'
+            exit 1
           fi
       - name: Publicar panel HTML como descarga directa
         if: github.event_name == 'push'
