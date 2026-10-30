@@ -1,0 +1,88 @@
+{
+  "hour_BTC-EUR": {
+    "code": "0",
+    "msg": "",
+    "data": [
+      [
+        "1735686000000",
+        "90027.1",
+        "90332.4",
+        "89946.9",
+        "90222.4",
+        "7.63320385",
+        "687751.704923467",
+        "687751.704923467",
+        "1"
+      ],
+      [
+        "1735682400000",
+        "90453.5",
+        "90453.5",
+        "89946.9",
+        "90021.2",
+        "6.26625673",
+        "565359.029455116",
+        "565359.029455116",
+        "1"
+      ],
+      [
+        "1735678800000",
+        "90189.4",
+        "90516.9",
+        "90107.5",
+        "90462.7",
+        "9.37507064",
+        "846396.717278965",
+        "846396.717278965",
+        "1"
+      ],
+      [
+        "1735675200000",
+        "90753.3",
+        "90797.3",
+        "90054.6",
+        "90195.7",
+        "13.50247125",
+        "1221119.220931409",
+        "1221119.220931409",
+        "1"
+      ],
+      [
+        "1735671600000",
+        "90537.6",
+        "90884.4",
+        "90342.7",
+        "90747.6",
+        "10.45803287",
+        "947582.488285694",
+        "947582.488285694",
+        "1"
+      ]
+    ],
+    "query": "/api/v5/market/history-candles?instId=BTC-EUR&bar=1H&after=1735689600000&limit=5"
+  },
+  "hour_BTC-USDC": {
+    "code": "0",
+    "msg": "",
+    "data": [],
+    "query": "/api/v5/market/history-candles?instId=BTC-USDC&bar=1H&after=1735689600000&limit=5"
+  },
+  "hour_BTC-USD": {
+    "code": "51001",
+    "msg": "Instrument ID, Instrument ID code, or Spread ID doesn't exist.",
+    "data": [],
+    "query": "/api/v5/market/history-candles?instId=BTC-USD&bar=1H&after=1735689600000&limit=5"
+  },
+  "bulk_BTC-EUR": {
+    "error": "HTTP Error 400: Bad Request",
+    "query": "/api/v5/public/market-data-history?module=2&instType=SPOT&instIdList=BTC-EUR&dateAggrType=monthly&begin=2025-01-01&end=2025-02-01"
+  },
+  "bulk_BTC-USDC": {
+    "error": "HTTP Error 400: Bad Request",
+    "query": "/api/v5/public/market-data-history?module=2&instType=SPOT&instIdList=BTC-USDC&dateAggrType=monthly&begin=2025-01-01&end=2025-02-01"
+  },
+  "bulk_BTC-USD": {
+    "error": "HTTP Error 400: Bad Request",
+    "query": "/api/v5/public/market-data-history?module=2&instType=SPOT&instIdList=BTC-USD&dateAggrType=monthly&begin=2025-01-01&end=2025-02-01"
+  }
+}
