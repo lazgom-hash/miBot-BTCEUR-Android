@@ -1,88 +1,613 @@
 {
-  "hour_BTC-EUR": {
+  "hour_BTC-EUR_2024-10-01": {
     "code": "0",
     "msg": "",
     "data": [
       [
-        "1735686000000",
-        "90027.1",
-        "90332.4",
-        "89946.9",
-        "90222.4",
-        "7.63320385",
-        "687751.704923467",
-        "687751.704923467",
+        "1727737200000",
+        "56960.2",
+        "57080",
+        "56430.3",
+        "56859.2",
+        "8.33702362",
+        "472282.031674562",
+        "472282.031674562",
         "1"
       ],
       [
-        "1735682400000",
-        "90453.5",
-        "90453.5",
-        "89946.9",
-        "90021.2",
-        "6.26625673",
-        "565359.029455116",
-        "565359.029455116",
-        "1"
-      ],
-      [
-        "1735678800000",
-        "90189.4",
-        "90516.9",
-        "90107.5",
-        "90462.7",
-        "9.37507064",
-        "846396.717278965",
-        "846396.717278965",
-        "1"
-      ],
-      [
-        "1735675200000",
-        "90753.3",
-        "90797.3",
-        "90054.6",
-        "90195.7",
-        "13.50247125",
-        "1221119.220931409",
-        "1221119.220931409",
-        "1"
-      ],
-      [
-        "1735671600000",
-        "90537.6",
-        "90884.4",
-        "90342.7",
-        "90747.6",
-        "10.45803287",
-        "947582.488285694",
-        "947582.488285694",
+        "1727733600000",
+        "57194",
+        "57194",
+        "56964.7",
+        "56964.7",
+        "1.07910308",
+        "61556.985218404",
+        "61556.985218404",
         "1"
       ]
-    ],
-    "query": "/api/v5/market/history-candles?instId=BTC-EUR&bar=1H&after=1735689600000&limit=5"
+    ]
   },
-  "hour_BTC-USDC": {
+  "hour_BTC-EUR_2025-12-01": {
     "code": "0",
     "msg": "",
-    "data": [],
-    "query": "/api/v5/market/history-candles?instId=BTC-USDC&bar=1H&after=1735689600000&limit=5"
+    "data": [
+      [
+        "1764543600000",
+        "78687.6",
+        "78687.6",
+        "77999.9",
+        "77999.9",
+        "0.09809842",
+        "7676.995092127",
+        "7676.995092127",
+        "1"
+      ],
+      [
+        "1764540000000",
+        "78659.1",
+        "78684.9",
+        "78594.8",
+        "78680.7",
+        "0.00315894",
+        "248.412882054",
+        "248.412882054",
+        "1"
+      ]
+    ]
   },
-  "hour_BTC-USD": {
+  "hour_BTC-EUR_2026-09-01": {
+    "code": "0",
+    "msg": "",
+    "data": [
+      [
+        "1788217200000",
+        "67650",
+        "67650",
+        "67500",
+        "67626.9",
+        "0.80669463",
+        "54536.169203483",
+        "54536.169203483",
+        "1"
+      ],
+      [
+        "1788213600000",
+        "67969.9",
+        "68013.3",
+        "67650",
+        "67655",
+        "11.83520446",
+        "802598.174260199",
+        "802598.174260199",
+        "1"
+      ]
+    ]
+  },
+  "hour_BTC-EUR_2026-10-25": {
+    "code": "0",
+    "msg": "",
+    "data": [
+      [
+        "1792882800000",
+        "71936.7",
+        "72200",
+        "71883.7",
+        "72177.2",
+        "0.77084876",
+        "55556.879939303",
+        "55556.879939303",
+        "1"
+      ],
+      [
+        "1792879200000",
+        "71764.1",
+        "71956.5",
+        "71764.1",
+        "71918.7",
+        "0.15318077",
+        "11006.741514266",
+        "11006.741514266",
+        "1"
+      ]
+    ]
+  },
+  "hour_BTC-USDC_2024-10-01": {
+    "code": "0",
+    "msg": "",
+    "data": []
+  },
+  "hour_BTC-USDC_2025-12-01": {
+    "code": "0",
+    "msg": "",
+    "data": [
+      [
+        "1764543600000",
+        "90914.2",
+        "90914.2",
+        "90449.3",
+        "90449.3",
+        "0.11778673",
+        "10673.561521132",
+        "10673.561521132",
+        "1"
+      ],
+      [
+        "1764540000000",
+        "90999",
+        "90999",
+        "90999",
+        "90999",
+        "0",
+        "0",
+        "0",
+        "1"
+      ]
+    ]
+  },
+  "hour_BTC-USDC_2026-09-01": {
+    "code": "0",
+    "msg": "",
+    "data": [
+      [
+        "1788217200000",
+        "78574",
+        "78574",
+        "78387.5",
+        "78542.9",
+        "2.26152146",
+        "177466.321346714",
+        "177466.321346714",
+        "1"
+      ],
+      [
+        "1788213600000",
+        "78972.4",
+        "78997.7",
+        "78568.9",
+        "78592",
+        "7.21778413",
+        "569264.629765025",
+        "569264.629765025",
+        "1"
+      ]
+    ]
+  },
+  "hour_BTC-USDC_2026-10-25": {
+    "code": "0",
+    "msg": "",
+    "data": [
+      [
+        "1792882800000",
+        "80510.8",
+        "80830",
+        "80449.8",
+        "80795.6",
+        "11.60025132",
+        "935456.436000742",
+        "935456.436000742",
+        "1"
+      ],
+      [
+        "1792879200000",
+        "80324.4",
+        "80550.9",
+        "80324.4",
+        "80509.2",
+        "1.57260746",
+        "126547.507658252",
+        "126547.507658252",
+        "1"
+      ]
+    ]
+  },
+  "hour_BTC-USD_2024-10-01": {
     "code": "51001",
     "msg": "Instrument ID, Instrument ID code, or Spread ID doesn't exist.",
-    "data": [],
-    "query": "/api/v5/market/history-candles?instId=BTC-USD&bar=1H&after=1735689600000&limit=5"
+    "data": []
   },
-  "bulk_BTC-EUR": {
-    "error": "HTTP Error 400: Bad Request",
-    "query": "/api/v5/public/market-data-history?module=2&instType=SPOT&instIdList=BTC-EUR&dateAggrType=monthly&begin=2025-01-01&end=2025-02-01"
+  "hour_BTC-USD_2025-12-01": {
+    "code": "51001",
+    "msg": "Instrument ID, Instrument ID code, or Spread ID doesn't exist.",
+    "data": []
   },
-  "bulk_BTC-USDC": {
-    "error": "HTTP Error 400: Bad Request",
-    "query": "/api/v5/public/market-data-history?module=2&instType=SPOT&instIdList=BTC-USDC&dateAggrType=monthly&begin=2025-01-01&end=2025-02-01"
+  "hour_BTC-USD_2026-09-01": {
+    "code": "51001",
+    "msg": "Instrument ID, Instrument ID code, or Spread ID doesn't exist.",
+    "data": []
   },
-  "bulk_BTC-USD": {
-    "error": "HTTP Error 400: Bad Request",
-    "query": "/api/v5/public/market-data-history?module=2&instType=SPOT&instIdList=BTC-USD&dateAggrType=monthly&begin=2025-01-01&end=2025-02-01"
+  "hour_BTC-USD_2026-10-25": {
+    "code": "51001",
+    "msg": "Instrument ID, Instrument ID code, or Spread ID doesn't exist.",
+    "data": []
+  },
+  "bulk_BTC-EUR_2024_10": {
+    "code": "0",
+    "msg": "",
+    "data": [
+      {
+        "dateAggrType": "monthly",
+        "details": [
+          {
+            "ccy": "",
+            "dateRangeEnd": "1730390400000",
+            "dateRangeStart": "1727712000000",
+            "groupDetails": [
+              {
+                "dateTs": "1730390400000",
+                "filename": "BTC-EUR-candlesticks-2024-11.zip",
+                "sizeMB": "0.96",
+                "url": "https://static.okx.com/cdn/okex/traderecords/candlesticks/monthly/202411/BTC-EUR-candlesticks-2024-11.zip?v=1001"
+              },
+              {
+                "dateTs": "1727712000000",
+                "filename": "BTC-EUR-candlesticks-2024-10.zip",
+                "sizeMB": "0.67",
+                "url": "https://static.okx.com/cdn/okex/traderecords/candlesticks/monthly/202410/BTC-EUR-candlesticks-2024-10.zip?v=1001"
+              }
+            ],
+            "groupSizeMB": "1.63",
+            "instFamily": "",
+            "instId": "BTC-EUR",
+            "instType": "SPOT"
+          }
+        ],
+        "totalSizeMB": "1.63",
+        "ts": "1793374722236"
+      }
+    ]
+  },
+  "bulk_BTC-EUR_2025_1": {
+    "code": "0",
+    "msg": "",
+    "data": [
+      {
+        "dateAggrType": "monthly",
+        "details": [
+          {
+            "ccy": "",
+            "dateRangeEnd": "1738339200000",
+            "dateRangeStart": "1735660800000",
+            "groupDetails": [
+              {
+                "dateTs": "1738339200000",
+                "filename": "BTC-EUR-candlesticks-2025-02.zip",
+                "sizeMB": "1.06",
+                "url": "https://static.okx.com/cdn/okex/traderecords/candlesticks/monthly/202502/BTC-EUR-candlesticks-2025-02.zip?v=1001"
+              },
+              {
+                "dateTs": "1735660800000",
+                "filename": "BTC-EUR-candlesticks-2025-01.zip",
+                "sizeMB": "1.15",
+                "url": "https://static.okx.com/cdn/okex/traderecords/candlesticks/monthly/202501/BTC-EUR-candlesticks-2025-01.zip?v=1001"
+              }
+            ],
+            "groupSizeMB": "2.21",
+            "instFamily": "",
+            "instId": "BTC-EUR",
+            "instType": "SPOT"
+          }
+        ],
+        "totalSizeMB": "2.21",
+        "ts": "1793374722968"
+      }
+    ]
+  },
+  "bulk_BTC-EUR_2025_12": {
+    "code": "0",
+    "msg": "",
+    "data": [
+      {
+        "dateAggrType": "monthly",
+        "details": [
+          {
+            "ccy": "",
+            "dateRangeEnd": "1767196800000",
+            "dateRangeStart": "1764518400000",
+            "groupDetails": [
+              {
+                "dateTs": "1767196800000",
+                "filename": "BTC-EUR-candlesticks-2026-01.zip",
+                "sizeMB": "0.36",
+                "url": "https://static.okx.com/cdn/okex/traderecords/candlesticks/monthly/202601/BTC-EUR-candlesticks-2026-01.zip?v=1001"
+              },
+              {
+                "dateTs": "1764518400000",
+                "filename": "BTC-EUR-candlesticks-2025-12.zip",
+                "sizeMB": "0.48",
+                "url": "https://static.okx.com/cdn/okex/traderecords/candlesticks/monthly/202512/BTC-EUR-candlesticks-2025-12.zip?v=1001"
+              }
+            ],
+            "groupSizeMB": "0.84",
+            "instFamily": "",
+            "instId": "BTC-EUR",
+            "instType": "SPOT"
+          }
+        ],
+        "totalSizeMB": "0.84",
+        "ts": "1793374723713"
+      }
+    ]
+  },
+  "bulk_BTC-EUR_2026_9": {
+    "code": "0",
+    "msg": "",
+    "data": [
+      {
+        "dateAggrType": "monthly",
+        "details": [
+          {
+            "ccy": "",
+            "dateRangeEnd": "1788192000000",
+            "dateRangeStart": "1788192000000",
+            "groupDetails": [
+              {
+                "dateTs": "1788192000000",
+                "filename": "BTC-EUR-candlesticks-2026-09.zip",
+                "sizeMB": "0.9",
+                "url": "https://static.okx.com/cdn/okex/traderecords/candlesticks/monthly/202609/BTC-EUR-candlesticks-2026-09.zip?v=1001"
+              }
+            ],
+            "groupSizeMB": "0.9",
+            "instFamily": "",
+            "instId": "BTC-EUR",
+            "instType": "SPOT"
+          }
+        ],
+        "totalSizeMB": "0.9",
+        "ts": "1793374724434"
+      }
+    ]
+  },
+  "bulk_BTC-USDC_2024_10": {
+    "code": "0",
+    "msg": "",
+    "data": [
+      {
+        "dateAggrType": "monthly",
+        "details": [
+          {
+            "ccy": "",
+            "dateRangeEnd": "1730390400000",
+            "dateRangeStart": "1727712000000",
+            "groupDetails": [
+              {
+                "dateTs": "1730390400000",
+                "filename": "BTC-USDC-candlesticks-2024-11.zip",
+                "sizeMB": "1.23",
+                "url": "https://static.okx.com/cdn/okex/traderecords/candlesticks/monthly/202411/BTC-USDC-candlesticks-2024-11.zip?v=1001"
+              },
+              {
+                "dateTs": "1727712000000",
+                "filename": "BTC-USDC-candlesticks-2024-10.zip",
+                "sizeMB": "1.19",
+                "url": "https://static.okx.com/cdn/okex/traderecords/candlesticks/monthly/202410/BTC-USDC-candlesticks-2024-10.zip?v=1001"
+              }
+            ],
+            "groupSizeMB": "2.42",
+            "instFamily": "",
+            "instId": "BTC-USDC",
+            "instType": "SPOT"
+          }
+        ],
+        "totalSizeMB": "2.42",
+        "ts": "1793374725172"
+      }
+    ]
+  },
+  "bulk_BTC-USDC_2025_1": {
+    "code": "0",
+    "msg": "",
+    "data": [
+      {
+        "dateAggrType": "monthly",
+        "details": [
+          {
+            "ccy": "",
+            "dateRangeEnd": "1738339200000",
+            "dateRangeStart": "1735660800000",
+            "groupDetails": [
+              {
+                "dateTs": "1738339200000",
+                "filename": "BTC-USDC-candlesticks-2025-02.zip",
+                "sizeMB": "1.14",
+                "url": "https://static.okx.com/cdn/okex/traderecords/candlesticks/monthly/202502/BTC-USDC-candlesticks-2025-02.zip?v=1001"
+              },
+              {
+                "dateTs": "1735660800000",
+                "filename": "BTC-USDC-candlesticks-2025-01.zip",
+                "sizeMB": "1.27",
+                "url": "https://static.okx.com/cdn/okex/traderecords/candlesticks/monthly/202501/BTC-USDC-candlesticks-2025-01.zip?v=1001"
+              }
+            ],
+            "groupSizeMB": "2.41",
+            "instFamily": "",
+            "instId": "BTC-USDC",
+            "instType": "SPOT"
+          }
+        ],
+        "totalSizeMB": "2.41",
+        "ts": "1793374725902"
+      }
+    ]
+  },
+  "bulk_BTC-USDC_2025_12": {
+    "code": "0",
+    "msg": "",
+    "data": [
+      {
+        "dateAggrType": "monthly",
+        "details": [
+          {
+            "ccy": "",
+            "dateRangeEnd": "1767196800000",
+            "dateRangeStart": "1764518400000",
+            "groupDetails": [
+              {
+                "dateTs": "1767196800000",
+                "filename": "BTC-USDC-candlesticks-2026-01.zip",
+                "sizeMB": "0.28",
+                "url": "https://static.okx.com/cdn/okex/traderecords/candlesticks/monthly/202601/BTC-USDC-candlesticks-2026-01.zip?v=1001"
+              },
+              {
+                "dateTs": "1764518400000",
+                "filename": "BTC-USDC-candlesticks-2025-12.zip",
+                "sizeMB": "0.29",
+                "url": "https://static.okx.com/cdn/okex/traderecords/candlesticks/monthly/202512/BTC-USDC-candlesticks-2025-12.zip?v=1001"
+              }
+            ],
+            "groupSizeMB": "0.57",
+            "instFamily": "",
+            "instId": "BTC-USDC",
+            "instType": "SPOT"
+          }
+        ],
+        "totalSizeMB": "0.57",
+        "ts": "1793374726630"
+      }
+    ]
+  },
+  "bulk_BTC-USDC_2026_9": {
+    "code": "0",
+    "msg": "",
+    "data": [
+      {
+        "dateAggrType": "monthly",
+        "details": [
+          {
+            "ccy": "",
+            "dateRangeEnd": "1788192000000",
+            "dateRangeStart": "1788192000000",
+            "groupDetails": [
+              {
+                "dateTs": "1788192000000",
+                "filename": "BTC-USDC-candlesticks-2026-09.zip",
+                "sizeMB": "1.05",
+                "url": "https://static.okx.com/cdn/okex/traderecords/candlesticks/monthly/202609/BTC-USDC-candlesticks-2026-09.zip?v=1001"
+              }
+            ],
+            "groupSizeMB": "1.05",
+            "instFamily": "",
+            "instId": "BTC-USDC",
+            "instType": "SPOT"
+          }
+        ],
+        "totalSizeMB": "1.05",
+        "ts": "1793374727342"
+      }
+    ]
+  },
+  "bulk_BTC-USD_2024_10": {
+    "code": "0",
+    "msg": "",
+    "data": [
+      {
+        "dateAggrType": "monthly",
+        "details": [],
+        "totalSizeMB": "0",
+        "ts": "1793374728067"
+      }
+    ]
+  },
+  "bulk_BTC-USD_2025_1": {
+    "code": "0",
+    "msg": "",
+    "data": [
+      {
+        "dateAggrType": "monthly",
+        "details": [
+          {
+            "ccy": "",
+            "dateRangeEnd": "1738339200000",
+            "dateRangeStart": "1735660800000",
+            "groupDetails": [
+              {
+                "dateTs": "1738339200000",
+                "filename": "BTC-USD-candlesticks-2025-02.zip",
+                "sizeMB": "0.62",
+                "url": "https://static.okx.com/cdn/okex/traderecords/candlesticks/monthly/202502/BTC-USD-candlesticks-2025-02.zip?v=1001"
+              },
+              {
+                "dateTs": "1735660800000",
+                "filename": "BTC-USD-candlesticks-2025-01.zip",
+                "sizeMB": "0.62",
+                "url": "https://static.okx.com/cdn/okex/traderecords/candlesticks/monthly/202501/BTC-USD-candlesticks-2025-01.zip?v=1001"
+              }
+            ],
+            "groupSizeMB": "1.24",
+            "instFamily": "",
+            "instId": "BTC-USD",
+            "instType": "SPOT"
+          }
+        ],
+        "totalSizeMB": "1.24",
+        "ts": "1793374728790"
+      }
+    ]
+  },
+  "bulk_BTC-USD_2025_12": {
+    "code": "0",
+    "msg": "",
+    "data": [
+      {
+        "dateAggrType": "monthly",
+        "details": [
+          {
+            "ccy": "",
+            "dateRangeEnd": "1767196800000",
+            "dateRangeStart": "1764518400000",
+            "groupDetails": [
+              {
+                "dateTs": "1767196800000",
+                "filename": "BTC-USD-candlesticks-2026-01.zip",
+                "sizeMB": "1.06",
+                "url": "https://static.okx.com/cdn/okex/traderecords/candlesticks/monthly/202601/BTC-USD-candlesticks-2026-01.zip?v=1001"
+              },
+              {
+                "dateTs": "1764518400000",
+                "filename": "BTC-USD-candlesticks-2025-12.zip",
+                "sizeMB": "1.07",
+                "url": "https://static.okx.com/cdn/okex/traderecords/candlesticks/monthly/202512/BTC-USD-candlesticks-2025-12.zip?v=1001"
+              }
+            ],
+            "groupSizeMB": "2.13",
+            "instFamily": "",
+            "instId": "BTC-USD",
+            "instType": "SPOT"
+          }
+        ],
+        "totalSizeMB": "2.13",
+        "ts": "1793374729558"
+      }
+    ]
+  },
+  "bulk_BTC-USD_2026_9": {
+    "code": "0",
+    "msg": "",
+    "data": [
+      {
+        "dateAggrType": "monthly",
+        "details": [
+          {
+            "ccy": "",
+            "dateRangeEnd": "1788192000000",
+            "dateRangeStart": "1788192000000",
+            "groupDetails": [
+              {
+                "dateTs": "1788192000000",
+                "filename": "BTC-USD-candlesticks-2026-09.zip",
+                "sizeMB": "1.1",
+                "url": "https://static.okx.com/cdn/okex/traderecords/candlesticks/monthly/202609/BTC-USD-candlesticks-2026-09.zip?v=1001"
+              }
+            ],
+            "groupSizeMB": "1.1",
+            "instFamily": "",
+            "instId": "BTC-USD",
+            "instType": "SPOT"
+          }
+        ],
+        "totalSizeMB": "1.1",
+        "ts": "1793374730312"
+      }
+    ]
   }
 }
