@@ -40,9 +40,10 @@ jobs:
       - name: Preparar SDK Android disponible en GitHub
         run: |
           echo "ANDROID_HOME=${ANDROID_HOME}"
-          command -v sdkmanager
-          sdkmanager --version
-          sdkmanager --install 'platforms;android-35' 'build-tools;35.0.0'
+          SDKMANAGER="$(find "$ANDROID_HOME/cmdline-tools" -type f -name sdkmanager -print -quit)"
+          if [ -z "$SDKMANAGER" ]; then echo 'Falta sdkmanager'; exit 1; fi
+          "$SDKMANAGER" --version
+          "$SDKMANAGER" --install 'platforms;android-35' 'build-tools;35.0.0'
 
       - name: Preparar Gradle
         uses: gradle/actions/setup-gradle@v4
