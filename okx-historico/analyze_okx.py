@@ -131,7 +131,8 @@ def compare_alignment(data):
     spans={z:{'first':int(data[z]['t'][0]),'last':int(data[z]['t'][-1]),'bars':len(data[z])} for z in SYM}
     stats={'symbols':spans,'common_bars':len(ts),'common_first':int(ts[0]),'common_last':int(ts[-1]),'shared_window_minutes':int((ts[-1]-ts[0])//60+1),'absent_minutes_shared_window':int((ts[-1]-ts[0])//60+1-len(ts)),
            'missing_rate_common_window_pct':round(100*((ts[-1]-ts[0])//60+1-len(ts))/((ts[-1]-ts[0])//60+1),3),
-           'gaps_gt1m':int(np.sum(dif>60)),'max_gap_hours':round(float(dif.max())/3600,3)}
+           'gaps_gt1m':int(np.sum(dif>60)),'max_gap_hours':round(float(dif.max())/3600,3),
+           'gaps_utc':[{'before':datetime.fromtimestamp(int(ts[i]),timezone.utc).isoformat(),'after':datetime.fromtimestamp(int(ts[i+1]),timezone.utc).isoformat(),'missing_minutes':int((ts[i+1]-ts[i])//60-1)} for i in np.where(dif>60)[0][:30]]}
     return ts,a,b,stats
 
 def run_bot(ts,rows,fx_daily,quote):
@@ -251,6 +252,16 @@ def main():
         print('SIMULATING',name,flush=True)
         results[name]=run_bot(ts,rows,fx_by_day,quote)
         print('DONE',name,{k:v for k,v in results[name].items() if k!='monthly'},flush=True)
+    # Sensitivity test: do not discard EUR candles merely because USD counterpart is missing.
+    results['sensitivity_independent_candles']={}
+    for name,quote in [('BTC-EUR','EUR'),('BTC-USDC','USDC')]:
+        original=data[name]
+        original=original[(original['t']>=ts[0])&(original['t']<=ts[-1])]
+        original_days=np.arange(original['t'][0]//86400, original['t'][-1]//86400+1)
+        original_fx=np.interp(original_days,dd,fx)
+        scenario=run_bot(original['t'],original,original_fx,quote)
+        results['sensitivity_independent_candles'][name]={k:v for k,v in scenario.items() if k!='monthly'}
+        print('SENSITIVITY',name,results['sensitivity_independent_candles'][name],flush=True)
     a,b=results['BTC-EUR'],results['BTC-USDC']
     results['difference_eur_minus_usdc']={k:round(a[k]-b[k],2) for k in ['net_wealth_gain_eur','equity_eur','realized_bot_profit_eur','personal_withdrawn_eur','external_eur','unrealized_pnl_eur','longest_oor_days']}
     results['difference_eur_minus_usdc'].update({k:a[k]-b[k] for k in ['cycles','months_profitable','months_withdrawals']})
