@@ -52,6 +52,17 @@ jobs:
             git commit -m "OKX: muestra pública de libros de órdenes [skip ci]"
             git push origin HEAD:main
           fi
+      - name: Publicar panel HTML como descarga directa
+        if: github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp comparador-okx/index.html miBot-Comparador-OKX-1.0.html
+          if gh release view comparador-okx-v1.0 >/dev/null 2>&1; then
+            gh release upload comparador-okx-v1.0 miBot-Comparador-OKX-1.0.html --clobber
+          else
+            gh release create comparador-okx-v1.0 miBot-Comparador-OKX-1.0.html --title 'miBot Comparador OKX 1.0' --notes 'Panel de spreads y profundidad BTC/EUR frente a BTC/USDC o BTC/USD, según el símbolo que la API pública entregue. Datos recogidos por GitHub Actions cada cinco minutos programados, con posibles retrasos.'
+          fi
       - name: Señalar incidencias de consulta
         if: steps.sample.outcome == 'failure'
         run: |
