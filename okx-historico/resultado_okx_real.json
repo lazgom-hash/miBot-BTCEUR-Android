@@ -37,7 +37,14 @@
     "absent_minutes_shared_window": 1268,
     "missing_rate_common_window_pct": 0.084,
     "gaps_gt1m": 1,
-    "max_gap_hours": 21.15
+    "max_gap_hours": 21.15,
+    "gaps_utc": [
+      {
+        "before": "2025-08-20T10:54:00+00:00",
+        "after": "2025-08-21T08:03:00+00:00",
+        "missing_minutes": 1268
+      }
+    ]
   },
   "archive_audit": {
     "BTC-EUR": {
@@ -1343,6 +1350,54 @@
         "contributions_eur": 0
       }
     ]
+  },
+  "sensitivity_independent_candles": {
+    "BTC-EUR": {
+      "market": "EUR",
+      "start_utc": "2023-11-21T10:27:00+00:00",
+      "end_utc": "2026-09-30T15:59:00+00:00",
+      "initial_eur": 15000,
+      "external_eur": 5100.0,
+      "personal_withdrawn_eur": 2039.42,
+      "realized_bot_profit_eur": 8989.2,
+      "equity_eur": 27016.09,
+      "net_wealth_gain_eur": 8955.51,
+      "unrealized_pnl_eur": -33.68,
+      "cycles": 752,
+      "buy_orders": 2326,
+      "months_profitable": 28,
+      "months_withdrawals": 11,
+      "months": 35,
+      "longest_no_profit_streak_months": 3,
+      "oor_entry_count": 3,
+      "longest_oor_days": 89.37,
+      "phase_change_utc": "2025-04-28T10:43:00+00:00",
+      "current_phase": "post",
+      "last_cycle_close_utc": "2026-09-23T04:23:00+00:00"
+    },
+    "BTC-USDC": {
+      "market": "USDC",
+      "start_utc": "2023-11-21T10:27:00+00:00",
+      "end_utc": "2026-09-30T15:59:00+00:00",
+      "initial_eur": 15000,
+      "external_eur": 4500.0,
+      "personal_withdrawn_eur": 2857.84,
+      "realized_bot_profit_eur": 9467.23,
+      "equity_eur": 25073.19,
+      "net_wealth_gain_eur": 8431.03,
+      "unrealized_pnl_eur": -43.55,
+      "cycles": 844,
+      "buy_orders": 2551,
+      "months_profitable": 28,
+      "months_withdrawals": 13,
+      "months": 35,
+      "longest_no_profit_streak_months": 3,
+      "oor_entry_count": 2,
+      "longest_oor_days": 88.61,
+      "phase_change_utc": "2025-02-03T15:50:00+00:00",
+      "current_phase": "post",
+      "last_cycle_close_utc": "2026-09-23T01:13:00+00:00"
+    }
   },
   "difference_eur_minus_usdc": {
     "net_wealth_gain_eur": 524.48,
