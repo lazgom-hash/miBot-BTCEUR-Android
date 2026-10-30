@@ -1,0 +1,45 @@
+name: OKX datos historicos - prueba de disponibilidad
+on:
+  push:
+    paths:
+      - '.github/workflows/okx-historico-prueba.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  data:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Consultar fuentes originales de OKX
+        run: |
+          mkdir -p okx-historico
+          python3 - <<'PY'
+          import json,urllib.request,urllib.parse,time
+          base='https://www.okx.com'
+          tasks=[]
+          for sym in ('BTC-EUR','BTC-USDC','BTC-USD'):
+            q={'instId':sym,'bar':'1H','after':'1735689600000','limit':'5'}
+            tasks.append(('hour_'+sym, '/api/v5/market/history-candles?'+urllib.parse.urlencode(q)))
+          for syms in ('BTC-EUR','BTC-USDC','BTC-USD'):
+            q={'module':'2','instType':'SPOT','instIdList':syms,'dateAggrType':'monthly','begin':'2025-01-01','end':'2025-02-01'}
+            tasks.append(('bulk_'+syms,'/api/v5/public/market-data-history?'+urllib.parse.urlencode(q)))
+          results={}
+          for key,path in tasks:
+            try:
+              with urllib.request.urlopen(urllib.request.Request(base+path,headers={'User-Agent':'Mozilla/5.0'}),timeout=25) as r:
+                result=json.load(r)
+              results[key]={'code':result.get('code'),'msg':result.get('msg'),'data':result.get('data',[])[:5],'query':path}
+            except Exception as e: results[key]={'error':str(e),'query':path}
+            time.sleep(.4)
+          open('okx-historico/diagnostico.json','w').write(json.dumps(results,ensure_ascii=False,indent=2))
+          for k,x in results.items():print(k,x.get('code'),x.get('msg'),x.get('error'),str(x.get('data'))[:300])
+          PY
+      - name: Guardar prueba
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add okx-historico/diagnostico.json
+          git commit -m 'Diagnostico OKX historico [skip ci]' || true
+          git push origin HEAD:main
