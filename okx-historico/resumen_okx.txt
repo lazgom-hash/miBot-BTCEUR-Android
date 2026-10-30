@@ -1,0 +1,7 @@
+miBot 3.5 · BTC/EUR frente BTC/USDC · HISTORICO OFICIAL OKX
+Period: 2023-11-21T10:27:00+00:00 -> 2026-09-30T15:59:00+00:00
+Timeframe: 1m, common timestamps 1502425 missing 0.084 %
+RISK: prices from candles do not prove real fills; USD/EUR via implied ratio, no live FX conversion.
+BTC-EUR {'net_wealth_gain_eur': np.float64(8955.51), 'personal_withdrawn_eur': np.float64(2039.42), 'realized_bot_profit_eur': np.float64(8989.2), 'equity_eur': np.float64(27016.09), 'unrealized_pnl_eur': np.float64(-33.68), 'external_eur': 5100.0, 'cycles': 752, 'months_profitable': 28, 'months_withdrawals': 11, 'longest_oor_days': 89.37, 'phase_change_utc': '2025-04-28T10:43:00+00:00'}
+BTC-USDC {'net_wealth_gain_eur': np.float64(8431.03), 'personal_withdrawn_eur': np.float64(2857.84), 'realized_bot_profit_eur': np.float64(9467.23), 'equity_eur': np.float64(25073.19), 'unrealized_pnl_eur': np.float64(-43.55), 'external_eur': 4500.0, 'cycles': 844, 'months_profitable': 28, 'months_withdrawals': 13, 'longest_oor_days': 88.61, 'phase_change_utc': '2025-02-03T15:50:00+00:00'}
+DIFF EUR minus USDC {'net_wealth_gain_eur': np.float64(524.48), 'equity_eur': np.float64(1942.9), 'realized_bot_profit_eur': np.float64(-478.03), 'personal_withdrawn_eur': np.float64(-818.42), 'external_eur': 600.0, 'unrealized_pnl_eur': np.float64(9.87), 'longest_oor_days': 0.76, 'cycles': -92, 'months_profitable': 0, 'months_withdrawals': -2}
