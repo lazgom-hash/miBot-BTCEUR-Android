@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   android-apk:
@@ -67,3 +67,15 @@ jobs:
             app/build/outputs/apk/debug/SHA256.txt
           if-no-files-found: error
           retention-days: 30
+
+      - name: Crear descarga directa en GitHub Releases
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp app/build/outputs/apk/debug/app-debug.apk miBot-BTCEUR-1.0.0-debug.apk
+          if gh release view v1.0.0 >/dev/null 2>&1; then
+            gh release upload v1.0.0 miBot-BTCEUR-1.0.0-debug.apk --clobber
+          else
+            gh release create v1.0.0 miBot-BTCEUR-1.0.0-debug.apk --title "miBot BTC/EUR Android 1.0.0" --notes "APK de prueba. Descarga velas BTC/EUR de Bitstamp para generar un BIN de 20 bytes compatible con miBot. No probado en dispositivo real."
+          fi
+
