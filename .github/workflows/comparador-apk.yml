@@ -1,0 +1,60 @@
+name: Compilar miBot Comparador OKX Android
+on:
+  push:
+    paths:
+      - 'comparador-okx-android-source-1.0.tar.xz'
+      - '.github/workflows/comparador-apk.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  android-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Obtener código
+        uses: actions/checkout@v4
+      - name: Extraer proyecto Android
+        run: |
+          mkdir -p comparator-android
+          tar -xJf comparador-okx-android-source-1.0.tar.xz -C comparator-android
+          python3 comparator-android/tests/test_project.py
+      - name: Preparar Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Preparar Android SDK
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          SDKMANAGER="$(find "$ANDROID_HOME/cmdline-tools" -type f -name sdkmanager -print -quit)"
+          test -n "$SDKMANAGER"
+          "$SDKMANAGER" --install 'platforms;android-35' 'build-tools;35.0.0'
+      - name: Instalar Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.10.2'
+      - name: Construir APK
+        working-directory: comparator-android
+        run: gradle --no-daemon :app:assembleDebug
+      - name: Validar APK y publicar artefacto
+        run: |
+          test -s comparator-android/app/build/outputs/apk/debug/app-debug.apk
+          cp comparator-android/app/build/outputs/apk/debug/app-debug.apk miBot-Comparador-OKX-1.0.apk
+          sha256sum miBot-Comparador-OKX-1.0.apk | tee SHA256.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: miBot-Comparador-OKX-Android-APK
+          path: |
+            miBot-Comparador-OKX-1.0.apk
+            SHA256.txt
+          if-no-files-found: error
+      - name: Publicar descarga APK directa
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view comparador-okx-android-v1.0 >/dev/null 2>&1; then
+            gh release upload comparador-okx-android-v1.0 miBot-Comparador-OKX-1.0.apk --clobber
+          else
+            gh release create comparador-okx-android-v1.0 miBot-Comparador-OKX-1.0.apk --title 'miBot Comparador OKX Android 1.0' --notes 'Aplicación Android del panel miBot, con exportación CSV a Descargas. Los datos se obtienen del repositorio público y la recogida programada en GitHub continúa aunque la aplicación esté cerrada. No realiza operaciones.'
+          fi
