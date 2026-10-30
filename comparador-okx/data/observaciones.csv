@@ -1,0 +1,3 @@
+fecha_utc,mercado,simbolo_real,fecha_libro_utc,antiguedad_ms,bid,ask,medio,spread_bps,cambio_usd_eur_implicito,bid_btc_50,ask_btc_50,ida_vuelta_200eur_bps,ida_vuelta_300eur_bps,ida_vuelta_1000eur_bps,ida_vuelta_5000eur_bps,ida_vuelta_15000eur_bps,cobertura_200eur,cobertura_300eur,cobertura_1000eur,cobertura_5000eur,cobertura_15000eur
+2026-10-30T11:58:22Z,EUR,BTC-EUR,2026-10-30T11:58:22.851Z,104,69055.1,69070.7,69062.9,2.2588,1.11925144,11.08847977,10.23544529,22.2341,22.2341,22.2352,22.6804,22.9829,1,1,1,1,1
+2026-10-30T11:58:22Z,USD,BTC-USDC,2026-10-30T11:58:29.801Z,94,77298.7,77298.8,77298.75,0.0129,1.11925144,2.47497729,2.04516378,19.9929,20.1404,20.4439,20.7027,21.1673,1,1,1,1,1
