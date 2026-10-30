@@ -50,12 +50,31 @@ for sym in ('EURC-USDC','BTC-USDC'):
    'abnormal_5pct_candles':int(np.count_nonzero((a['h']/a['o']>1.05)|(a['l']/a['o']<0.95))),
    'missing_large_gaps':int(np.sum(dif>60))}
  print('RESULT',sym,{k:v for k,v in scenarios[sym].items() if k not in ('monthly','observed')},flush=True)
+# Split the actual common market samples into contiguous trading windows.
+# Never pretend that a delisted/inactive instrument kept trading throughout a one-year gap.
+jumps=np.where(np.diff(ts)>2*86400)[0]
+begins=[0]+[int(k+1) for k in jumps]
+ends=[int(k+1) for k in jumps]+[len(ts)]
+segments=[]
+for first,last in zip(begins,ends):
+ part=ts[first:last]
+ if len(part)<10000:continue
+ coverage=len(part)/((int(part[-1])-int(part[0]))//60+1)
+ segment={'start':datetime.fromtimestamp(int(part[0]),timezone.utc).isoformat(),
+          'end':datetime.fromtimestamp(int(part[-1]),timezone.utc).isoformat(),
+          'candles':len(part),'coverage_pct':round(coverage*100,3),'markets':{}}
+ for sym in ('EURC-USDC','BTC-USDC'):
+  full=data[sym];pr=full[np.searchsorted(full['t'],part)]
+  scen=run_bot(part,pr,np.ones(int((part[-1]//86400)-(part[0]//86400)+1)),'EUR')
+  segment['markets'][sym]={k:v for k,v in scen.items() if k!='monthly'}
+ segments.append(segment)
+ print('SEGMENT',segment,flush=True)
 a=scenarios['EURC-USDC'];b=scenarios['BTC-USDC']
 result={'source':'OKX monthly candlestick original ZIP, 1 minute, both pairs same timestamps',
 'currency':'All monetary amounts nominal USDC, no USD/EUR conversion',
 'method':'Same copied miBot model, N15 CB0.5% MM1.2 MC1.2 TP gross1%; buy and sell fee0.1%; deposits 200 pre25K and 300 post OOR; post25K profit split 80/20',
 'metadata':{'start':datetime.fromtimestamp(int(ts[0]),timezone.utc).isoformat(),'end':datetime.fromtimestamp(int(ts[-1]),timezone.utc).isoformat(),'common_candles':len(ts),'window_minutes':int((ts[-1]-ts[0])//60+1),'missing_pct':round((1-len(ts)/((ts[-1]-ts[0])//60+1))*100,4)},
-'audit':audit,'scenarios':scenarios,'difference_eurc_minus_btc':{k:round(a[k]-b[k],2) for k in ('net_wealth_gain_eur','personal_withdrawn_eur','realized_bot_profit_eur','external_eur','equity_eur','cycles','months_withdrawals','months_profitable')},
+'audit':audit,'scenarios':scenarios,'contiguous_segments':segments,'difference_eurc_minus_btc':{k:round(a[k]-b[k],2) for k in ('net_wealth_gain_eur','personal_withdrawn_eur','realized_bot_profit_eur','external_eur','equity_eur','cycles','months_withdrawals','months_profitable')},
 'limitations':['OHLC fills assumed when touched, no maker queue/slippage/order book','Same 15K initial funding in USDC and no conversion to euros','EURC stablecoin peg and regulatory/redemption/liquidity risk not modeled','BTC bot and EURC bot have different economic risk even in same quote currency'] }
 (DEST/'resultado_eurc_usdc_vs_btc_usdc.json').write_text(json.dumps(result,ensure_ascii=False,indent=2))
 with (DEST/'informe_eurc_usdc_vs_btc_usdc.txt').open('w') as f:
