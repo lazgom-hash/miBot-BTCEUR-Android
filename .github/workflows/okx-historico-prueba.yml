@@ -20,18 +20,31 @@ jobs:
           base='https://www.okx.com'
           tasks=[]
           for sym in ('BTC-EUR','BTC-USDC','BTC-USD'):
-            q={'instId':sym,'bar':'1H','after':'1735689600000','limit':'5'}
-            tasks.append(('hour_'+sym, '/api/v5/market/history-candles?'+urllib.parse.urlencode(q)))
+            for d in ('2024-10-01','2025-12-01','2026-09-01','2026-10-25'):
+              from datetime import datetime,timezone
+              ts=int(datetime.fromisoformat(d).replace(tzinfo=timezone.utc).timestamp()*1000)
+              q={'instId':sym,'bar':'1H','after':str(ts),'limit':'2'}
+              tasks.append((f'hour_{sym}_{d}','/api/v5/market/history-candles?'+urllib.parse.urlencode(q)))
           for syms in ('BTC-EUR','BTC-USDC','BTC-USD'):
-            q={'module':'2','instType':'SPOT','instIdList':syms,'dateAggrType':'monthly','begin':'2025-01-01','end':'2025-02-01'}
-            tasks.append(('bulk_'+syms,'/api/v5/public/market-data-history?'+urllib.parse.urlencode(q)))
+            for year,month in ((2024,10),(2025,1),(2025,12),(2026,9)):
+              from datetime import datetime,timezone
+              import calendar
+              a=int(datetime(year,month,1,tzinfo=timezone.utc).timestamp()*1000)
+              y2,m2=(year+1,1) if month==12 else (year,month+1)
+              z=int(datetime(y2,m2,1,tzinfo=timezone.utc).timestamp()*1000)-1
+              q={'module':'2','instType':'SPOT','instIdList':syms,'dateAggrType':'monthly','begin':str(a),'end':str(z)}
+              tasks.append((f'bulk_{syms}_{year}_{month}','/api/v5/public/market-data-history?'+urllib.parse.urlencode(q)))
           results={}
           for key,path in tasks:
             try:
               with urllib.request.urlopen(urllib.request.Request(base+path,headers={'User-Agent':'Mozilla/5.0'}),timeout=25) as r:
                 result=json.load(r)
-              results[key]={'code':result.get('code'),'msg':result.get('msg'),'data':result.get('data',[])[:5],'query':path}
-            except Exception as e: results[key]={'error':str(e),'query':path}
+              results[key]={'code':result.get('code'),'msg':result.get('msg'),'data':result.get('data',[])[:5]}
+            except Exception as e:
+              details=str(e)
+              try:details+=' '+e.read().decode('utf-8')[:500]
+              except Exception:pass
+              results[key]={'error':details}
             time.sleep(.4)
           open('okx-historico/diagnostico.json','w').write(json.dumps(results,ensure_ascii=False,indent=2))
           for k,x in results.items():print(k,x.get('code'),x.get('msg'),x.get('error'),str(x.get('data'))[:300])
