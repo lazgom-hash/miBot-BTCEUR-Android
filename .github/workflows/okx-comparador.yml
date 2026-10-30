@@ -1,0 +1,59 @@
+name: Comparador OKX - capturar libro cada cinco minutos
+on:
+  push:
+    paths:
+      - 'comparador-okx-source-1.0.tar.xz'
+      - 'comparador-okx/index.html'
+      - '.github/workflows/okx-comparador.yml'
+  workflow_dispatch:
+  schedule:
+    - cron: '2,7,12,17,22,27,32,37,42,47,52,57 * * * *'
+permissions:
+  contents: write
+concurrency:
+  group: mibot-okx-comparator-data
+  cancel-in-progress: false
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Descomprimir código del comparador
+        run: |
+          mkdir -p /tmp/mibot-comparator
+          tar -xJf comparador-okx-source-1.0.tar.xz -C /tmp/mibot-comparator
+      - name: Verificar cálculos sin datos externos
+        run: python -m unittest discover -s /tmp/mibot-comparator/tests -v
+      - name: Consultar OKX sin credenciales
+        id: sample
+        continue-on-error: true
+        run: |
+          mkdir -p comparador-okx/data
+          cp -a comparador-okx/data/. /tmp/mibot-comparator/comparador-okx/data/ || true
+          python /tmp/mibot-comparator/comparador-okx/collector.py
+      - name: Conservar datos y estado
+        if: always()
+        run: |
+          mkdir -p comparador-okx/data
+          cp /tmp/mibot-comparator/comparador-okx/data/estado.json comparador-okx/data/estado.json
+          if test -f /tmp/mibot-comparator/comparador-okx/data/observaciones.csv; then
+            cp /tmp/mibot-comparator/comparador-okx/data/observaciones.csv comparador-okx/data/observaciones.csv
+          fi
+      - name: Publicar medición en repositorio
+        if: always()
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add comparador-okx/data/
+          if ! git diff --cached --quiet; then
+            git commit -m "OKX: muestra pública de libros de órdenes [skip ci]"
+            git push origin HEAD:main
+          fi
+      - name: Señalar incidencias de consulta
+        if: steps.sample.outcome == 'failure'
+        run: |
+          echo 'La API de OKX falló; el estado se guardó. No se fabricaron mediciones.'
+          exit 1
