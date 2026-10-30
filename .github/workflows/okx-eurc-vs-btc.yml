@@ -19,8 +19,7 @@ jobs:
       - run: python -m pip install numpy
       - name: Descargar datos reales 1m y simular ambos mercados
         run: |
-          cd okx-historico
-          PYTHONUNBUFFERED=1 python eurc_vs_btc.py 2>&1 | tee ejecucion_eurc_vs_btc.log
+          PYTHONUNBUFFERED=1 python okx-historico/eurc_vs_btc.py 2>&1 | tee okx-historico/ejecucion_eurc_vs_btc.log
       - name: Guardar archivos de auditoria
         if: always()
         uses: actions/upload-artifact@v4
