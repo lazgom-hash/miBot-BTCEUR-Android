@@ -455,7 +455,7 @@
         "high_observed": 1.162,
         "minute_abs_return_median_pct": 0.0,
         "minute_abs_return_p99_pct": 0.09154130427694371,
-        "daily_close_vol_pct_annualized": 11.596831393652332,
+        "daily_close_vol_pct_annualized": 11.596831393652334,
         "abnormal_5pct_candles": 0,
         "missing_large_gaps": 1
       }
@@ -665,6 +665,116 @@
       }
     }
   },
+  "contiguous_segments": [
+    {
+      "start": "2024-10-31T16:00:00+00:00",
+      "end": "2025-03-19T09:02:00+00:00",
+      "candles": 199743,
+      "coverage_pct": 100.0,
+      "markets": {
+        "EURC-USDC": {
+          "market": "EUR",
+          "start_utc": "2024-10-31T16:00:00+00:00",
+          "end_utc": "2025-03-19T09:02:00+00:00",
+          "initial_eur": 15000,
+          "external_eur": 1000.0,
+          "personal_withdrawn_eur": 0.0,
+          "realized_bot_profit_eur": 49.15,
+          "equity_eur": 16049.42,
+          "net_wealth_gain_eur": 49.42,
+          "unrealized_pnl_eur": 0.27,
+          "cycles": 5,
+          "buy_orders": 26,
+          "months_profitable": 2,
+          "months_withdrawals": 0,
+          "months": 6,
+          "longest_no_profit_streak_months": 3,
+          "oor_entry_count": 0,
+          "longest_oor_days": 0.0,
+          "phase_change_utc": null,
+          "current_phase": "pre",
+          "last_cycle_close_utc": "2025-03-11T07:50:00+00:00"
+        },
+        "BTC-USDC": {
+          "market": "EUR",
+          "start_utc": "2024-10-31T16:00:00+00:00",
+          "end_utc": "2025-03-19T09:02:00+00:00",
+          "initial_eur": 15000,
+          "external_eur": 1000.0,
+          "personal_withdrawn_eur": 0.0,
+          "realized_bot_profit_eur": 1876.99,
+          "equity_eur": 17876.47,
+          "net_wealth_gain_eur": 1876.47,
+          "unrealized_pnl_eur": -0.53,
+          "cycles": 207,
+          "buy_orders": 652,
+          "months_profitable": 5,
+          "months_withdrawals": 0,
+          "months": 6,
+          "longest_no_profit_streak_months": 1,
+          "oor_entry_count": 0,
+          "longest_oor_days": 0.0,
+          "phase_change_utc": null,
+          "current_phase": "pre",
+          "last_cycle_close_utc": "2025-03-19T08:10:00+00:00"
+        }
+      }
+    },
+    {
+      "start": "2026-09-21T09:00:00+00:00",
+      "end": "2026-09-30T15:59:00+00:00",
+      "candles": 13380,
+      "coverage_pct": 100.0,
+      "markets": {
+        "EURC-USDC": {
+          "market": "EUR",
+          "start_utc": "2026-09-21T09:00:00+00:00",
+          "end_utc": "2026-09-30T15:59:00+00:00",
+          "initial_eur": 15000,
+          "external_eur": 200.0,
+          "personal_withdrawn_eur": 0.0,
+          "realized_bot_profit_eur": 9.76,
+          "equity_eur": 15206.43,
+          "net_wealth_gain_eur": 6.43,
+          "unrealized_pnl_eur": -3.32,
+          "cycles": 2,
+          "buy_orders": 7,
+          "months_profitable": 1,
+          "months_withdrawals": 0,
+          "months": 1,
+          "longest_no_profit_streak_months": 0,
+          "oor_entry_count": 0,
+          "longest_oor_days": 0.0,
+          "phase_change_utc": null,
+          "current_phase": "pre",
+          "last_cycle_close_utc": "2026-09-30T09:36:00+00:00"
+        },
+        "BTC-USDC": {
+          "market": "EUR",
+          "start_utc": "2026-09-21T09:00:00+00:00",
+          "end_utc": "2026-09-30T15:59:00+00:00",
+          "initial_eur": 15000,
+          "external_eur": 200.0,
+          "personal_withdrawn_eur": 0.0,
+          "realized_bot_profit_eur": 23.63,
+          "equity_eur": 15197.87,
+          "net_wealth_gain_eur": -2.13,
+          "unrealized_pnl_eur": -25.76,
+          "cycles": 6,
+          "buy_orders": 20,
+          "months_profitable": 1,
+          "months_withdrawals": 0,
+          "months": 1,
+          "longest_no_profit_streak_months": 0,
+          "oor_entry_count": 0,
+          "longest_oor_days": 0.0,
+          "phase_change_utc": null,
+          "current_phase": "pre",
+          "last_cycle_close_utc": "2026-09-23T01:13:00+00:00"
+        }
+      }
+    }
+  ],
   "difference_eurc_minus_btc": {
     "net_wealth_gain_eur": -1814.45,
     "personal_withdrawn_eur": 0.0,
