@@ -1,0 +1,43 @@
+name: Barrido EURC USDC parametros miBot
+on:
+  push:
+    paths:
+      - 'okx-historico/eurc_sweep.py'
+      - '.github/workflows/okx-eurc-sweep.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Dependencias numericas
+        run: python -m pip install numpy numba
+      - name: Barrido sobre velas originales 1m de OKX
+        run: |
+          export PYTHONUNBUFFERED=1
+          python okx-historico/eurc_sweep.py 2>&1 | tee okx-historico/eurc_sweep_ejecucion.log
+      - name: Guardar resultados y auditoria
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: EURC-USDC-barrido-completo
+          path: |
+            okx-historico/eurc_grid_sweep_resultados.json
+            okx-historico/eurc_grid_sweep_resumen.txt
+            okx-historico/eurc_sweep_ejecucion.log
+          retention-days: 30
+      - name: Publicar resultados verificables
+        if: success()
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add okx-historico/eurc_grid_sweep_resultados.json okx-historico/eurc_grid_sweep_resumen.txt
+          git commit -m 'Barrido EURC/USDC: parametros optimizados y control sobreajuste [skip ci]' || true
+          git pull --rebase origin main
+          git push origin HEAD:main
