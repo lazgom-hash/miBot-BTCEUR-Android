@@ -1,0 +1,41 @@
+name: Backtest EURC-USDC vs BTC-USDC OKX spot
+on:
+  push:
+    paths:
+      - 'okx-historico/eurc_vs_btc.py'
+      - '.github/workflows/okx-eurc-vs-btc.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install numpy
+      - name: Descargar datos reales 1m y simular ambos mercados
+        run: |
+          cd okx-historico
+          PYTHONUNBUFFERED=1 python eurc_vs_btc.py 2>&1 | tee ejecucion_eurc_vs_btc.log
+      - name: Guardar archivos de auditoria
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eurc-vs-btc-OKX-resultados
+          path: |
+            okx-historico/resultado_eurc_usdc_vs_btc_usdc.json
+            okx-historico/informe_eurc_usdc_vs_btc_usdc.txt
+            okx-historico/ejecucion_eurc_vs_btc.log
+      - name: Publicar resultados
+        if: success()
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add okx-historico/resultado_eurc_usdc_vs_btc_usdc.json okx-historico/informe_eurc_usdc_vs_btc_usdc.txt
+          git commit -m 'Resultados reales EURC-USDC vs BTC-USDC [skip ci]' || true
+          git pull --rebase origin main
+          git push origin HEAD:main
