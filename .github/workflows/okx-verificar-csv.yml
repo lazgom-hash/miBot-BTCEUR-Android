@@ -1,0 +1,38 @@
+name: OKX verificar formato CSV original
+on:
+  push:
+    paths: ['.github/workflows/okx-verificar-csv.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Descarga y muestra original ZIP
+        run: |
+          mkdir -p okx-historico
+          python3 - <<'PY'
+          import io,zipfile,urllib.request,json
+          res={}
+          for s in ['BTC-EUR','BTC-USDC']:
+            url=f'https://static.okx.com/cdn/okex/traderecords/candlesticks/monthly/202502/{s}-candlesticks-2025-02.zip?v=1001'
+            try:
+              raw=urllib.request.urlopen(url,timeout=45).read()
+              with zipfile.ZipFile(io.BytesIO(raw)) as z:
+                names=z.namelist()
+                data=z.read(names[0])
+                res[s]={'members':names,'bytes':len(raw),'first_1500':repr(data[:1500]),'last_250':repr(data[-250:])}
+            except Exception as e:res[s]={'error':str(e)}
+          open('okx-historico/muestra_formato.json','w').write(json.dumps(res,indent=2))
+          print(json.dumps(res,indent=2))
+          PY
+      - name: Guardar
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add okx-historico/muestra_formato.json
+          git commit -m 'Mostrar formato fuente de archivo OKX [skip ci]'
+          git pull --rebase origin main
+          git push origin HEAD:main
