@@ -54,21 +54,27 @@ def decode_zip(payload,sym):
             first=next(rows,None)
             if first is None:return np.empty(0,dtype=DT),{'header':'empty'}
             # OKX standard: timestamp,open,high,low,close,volume,...
-            probe=first[0].strip().strip('"')
-            if probe.isdigit(): src=iter([first]+list(rows));header='no header'
-            else: src=rows;header=','.join(first)
+            header_row=','.join(first)
+            if 'instrument_name' in first and 'open_time' in first:
+                mapping={name:i for i,name in enumerate(first)}
+                ti=mapping['open_time']; oi=mapping['open']; hi_i=mapping['high']; li=mapping['low'];ci=mapping['close']
+                src=rows
+            else:
+                ti=0;oi=1;hi_i=2;li=3;ci=4
+                probe=first[0].strip().strip('"')
+                src=iter([first]+list(rows)) if probe.isdigit() else rows
             for row in src:
                 try:
-                    t=int(float(row[0]));t=t//1000 if t>1e11 else t
+                    t=int(float(row[ti]));t=t//1000 if t>1e11 else t
                     if t%60:skipped+=1;continue
-                    op,hi,lo,cl=map(float,row[1:5])
+                    op,hi,lo,cl=map(float,(row[oi],row[hi_i],row[li],row[ci]))
                     if not(0<lo<=min(op,cl)<=max(op,cl)<=hi and np.isfinite(hi)):
                         skipped+=1;continue
                     out.append((t,op,hi,lo,cl))
                 except Exception:skipped+=1
         a=np.array(out,dtype=DT)
         a.sort(order='t')
-        return a,{'header':header,'rows':len(a),'invalid_rows':skipped,'zip_members':z.namelist()[:3]}
+        return a,{'header':header_row,'rows':len(a),'invalid_rows':skipped,'zip_members':z.namelist()[:3]}
 
 def get_month(sym,y,m):
     cache=BASE/'cache';cache.mkdir(exist_ok=True)
