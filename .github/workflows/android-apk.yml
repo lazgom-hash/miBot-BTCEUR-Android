@@ -37,11 +37,12 @@ jobs:
           javac -d /tmp/mibot-bin-test app/src/main/java/es/mibot/btceur/BinCodec.java tests/TestBinCodec.java
           java -cp /tmp/mibot-bin-test TestBinCodec
 
-      - name: Preparar Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Instalar plataforma Android 35
-        run: sdkmanager --install 'platforms;android-35' 'build-tools;35.0.0'
+      - name: Preparar SDK Android disponible en GitHub
+        run: |
+          echo "ANDROID_HOME=${ANDROID_HOME}"
+          command -v sdkmanager
+          sdkmanager --version
+          sdkmanager --install 'platforms;android-35' 'build-tools;35.0.0'
 
       - name: Preparar Gradle
         uses: gradle/actions/setup-gradle@v4
