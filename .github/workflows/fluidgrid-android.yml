@@ -3,6 +3,9 @@ on:
   push:
     branches: [fluidgrid-android]
     paths: ['FluidGrid/**', '.github/workflows/fluidgrid-android.yml']
+  pull_request:
+    branches: [main]
+    paths: ['FluidGrid/**', '.github/workflows/fluidgrid-android.yml']
   workflow_dispatch:
 jobs:
   build:
