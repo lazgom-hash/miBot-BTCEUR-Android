@@ -1,0 +1,168 @@
+package es.fluidgrid.app;
+
+import android.Manifest;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.Typeface;
+import android.graphics.drawable.GradientDrawable;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.text.InputType;
+import android.view.Gravity;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
+import android.widget.Toast;
+import java.text.DateFormat;
+import java.text.NumberFormat;
+import java.util.Date;
+import java.util.Locale;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+/** Native Android dashboard, not an HTML shortcut. */
+public final class MainActivity extends Activity {
+    private static final int BG=0xFF07131E,CARD=0xFF102236,LINE=0xFF35506A,WHITE=0xFFF1F7FB,MUTED=0xFFA4BBD0,
+        CYAN=0xFF69D8E0,GREEN=0xFF59D9A3,RED=0xFFFF888D,AMBER=0xFFFFCA75;
+    private final Handler handler=new Handler(Looper.getMainLooper());
+    private LinearLayout body;
+    private boolean active=false;
+    private final Runnable redraw=new Runnable(){@Override public void run(){if(active){render();handler.postDelayed(this,5000);}}};
+    @Override public void onCreate(Bundle state){super.onCreate(state);
+        if(Build.VERSION.SDK_INT>=33 && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)!=PackageManager.PERMISSION_GRANTED)
+            requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS},501);
+        ScrollView sc=new ScrollView(this);sc.setFillViewport(true);sc.setBackgroundColor(BG);
+        body=new LinearLayout(this);body.setOrientation(LinearLayout.VERTICAL);body.setPadding(dp(14),dp(18),dp(14),dp(40));
+        sc.addView(body);setContentView(sc);
+    }
+    @Override protected void onResume(){super.onResume();active=true;handler.removeCallbacks(redraw);redraw.run();}
+    @Override protected void onPause(){active=false;handler.removeCallbacks(redraw);super.onPause();}
+    private int dp(int n){return Math.round(n*getResources().getDisplayMetrics().density);}
+    private TextView text(String s,int size,int color,boolean bold){
+        TextView t=new TextView(this);t.setText(s);t.setTextSize(size);t.setTextColor(color);
+        if(bold)t.setTypeface(Typeface.DEFAULT,Typeface.BOLD);return t;
+    }
+    private LinearLayout panel(){
+        LinearLayout c=new LinearLayout(this);c.setOrientation(LinearLayout.VERTICAL);c.setPadding(dp(15),dp(15),dp(15),dp(15));
+        GradientDrawable d=new GradientDrawable();d.setColor(CARD);d.setCornerRadius(dp(17));d.setStroke(dp(1),LINE);c.setBackground(d);
+        LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,-2);p.setMargins(0,0,0,dp(11));body.addView(c,p);return c;
+    }
+    private void add(LinearLayout parent,String value,int size,int color,boolean bold){
+        TextView t=text(value,size,color,bold);LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,-2);p.bottomMargin=dp(6);parent.addView(t,p);
+    }
+    private Button button(String label,int color,Runnable action){
+        Button b=new Button(this);b.setText(label);b.setTextAllCaps(false);b.setTextColor(WHITE);
+        GradientDrawable d=new GradientDrawable();d.setColor(color);d.setCornerRadius(dp(10));b.setBackground(d);
+        b.setOnClickListener(v->action.run());return b;
+    }
+    private String num(double x,int decimals){NumberFormat f=NumberFormat.getNumberInstance(new Locale("es","ES"));f.setMinimumFractionDigits(decimals);f.setMaximumFractionDigits(decimals);return f.format(x);}
+    private String money(double x){return num(x,2)+" USDC";}
+    private String date(long millis){return millis==0?"—":DateFormat.getDateTimeInstance(DateFormat.SHORT,DateFormat.SHORT,Locale.getDefault()).format(new Date(millis));}
+    private void render(){
+        JSONObject s=new GridEngine(this).snapshot();body.removeAllViews();
+        add(body,"◈  FluidGrid",26,WHITE,true);
+        add(body,"BTC spot · FluidTrades SMC Lite · 1 hora · simulación",11,MUTED,false);
+        LinearLayout hero=panel();
+        String market=s.optString("market","BTC-USDC");add(hero,market+(s.optBoolean("proxy")?" · referencia USD (no USDC)":""),13,CYAN,true);
+        add(hero,s.optDouble("lastPrice")>0?num(s.optDouble("lastPrice"),2)+" USD":"Sin cotización verificada",27,WHITE,true);
+        add(hero,s.optString("status","Preparado"),12,s.optBoolean("blocked")?RED:MUTED,false);
+        add(hero,"Última actualización: "+date(s.optLong("lastUpdate")),11,MUTED,false);
+        LinearLayout buttons=new LinearLayout(this);buttons.setOrientation(LinearLayout.HORIZONTAL);
+        boolean started=s.optBoolean("started"),paused=s.optBoolean("paused");
+        Button play=button(started&&!paused?"En marcha":"▶ Iniciar / reanudar",0xFF187A8C,()->start());
+        Button stop=button("⏸ Pausar",0xFF51425F,()->pause());
+        LinearLayout.LayoutParams half=new LinearLayout.LayoutParams(0,dp(48),1);half.setMargins(0,0,dp(5),0);buttons.addView(play,half);buttons.addView(stop,new LinearLayout.LayoutParams(0,dp(48),1));hero.addView(buttons);
+        if(!started){Button setup=button("Configurar capital inicial",0xFF25517B,()->capitalDialog(s));hero.addView(setup);}
+        if(s.optBoolean("blocked")){
+            add(hero,"Se ha detectado un hueco de mercado. No se simulan operaciones durante datos no verificables.",12,RED,true);
+            hero.addView(button("Aceptar hueco y retomar desde ahora",0xFF694F21,()->confirmGap()));
+        }
+        LinearLayout metrics=panel();add(metrics,"PATRIMONIO Y BALANCES",12,CYAN,true);
+        metric(metrics,"Patrimonio liquidable",money(s.optDouble("equity")),WHITE);
+        metric(metrics,"USDC disponibles",money(s.optDouble("cash")),CYAN);
+        metric(metrics,"BTC en cartera",num(s.optDouble("btc"),8)+" BTC",WHITE);
+        metric(metrics,"Coste BTC pendientes",money(s.optDouble("cost")),WHITE);
+        metric(metrics,"Beneficio realizado",money(s.optDouble("realized")),GREEN);
+        double latent=s.optDouble("unrealized");metric(metrics,"Resultado latente",money(latent),latent>=0?GREEN:RED);
+        metric(metrics,"Precio medio efectivo",s.optDouble("average")>0?num(s.optDouble("average"),2)+" USD":"—",WHITE);
+        metric(metrics,"Precio mínimo TP neto 1 %",s.optDouble("target")>0?num(s.optDouble("target"),2)+" USD":"—",AMBER);
+        metric(metrics,"Aportaciones extraordinarias",money(s.optDouble("injected")),WHITE);
+        metrics.addView(button("+ Inyectar capital virtual",0xFF176F65,()->addDialog(s)));
+
+        JSONObject advice=s.optJSONObject("advice");LinearLayout a=panel();add(a,"ASESOR DE LIQUIDEZ",12,CYAN,true);
+        if(advice!=null){
+            String level=advice.optString("level");add(a,level,19,level.equals("Considerar aportación")?AMBER:GREEN,true);
+            add(a,advice.optString("reason"),13,WHITE,false);
+            metric(a,"Tramo de compra (10 %)",money(advice.optDouble("tranche")),WHITE);
+            if(advice.optDouble("suggested")>0)metric(a,"Aportación virtual sugerida",money(advice.optDouble("suggested")),AMBER);
+            if(advice.optDouble("nearestDemand")>0)metric(a,"Demanda más cercana",num(advice.optDouble("nearestDemand"),2)+" USD",CYAN);
+            if(advice.optDouble("scenarioTp")>0)metric(a,"TP si se compra otro tramo",num(advice.optDouble("scenarioTp"),2)+" USD",WHITE);
+            add(a,"El consejo sigue reglas de liquidez. No predice el precio, ni compromete aportaciones reales.",10,MUTED,false);
+        }
+        LinearLayout z=panel();add(z,"ZONAS ACTIVAS · 1H",12,CYAN,true);
+        JSONArray zones=s.optJSONArray("zones");int count=0;
+        if(zones!=null)for(int i=0;i<zones.length();i++){
+            JSONObject q=zones.optJSONObject(i);if(q==null)continue;count++;
+            add(z,(q.optString("type").equals("demand")?"🟢 DEMAND · ":"🔴 SUPPLY · ")+num(q.optDouble("bottom"),2)+"–"+num(q.optDouble("top"),2),12,WHITE,true);
+        }
+        if(count==0)add(z,"No hay zonas verificadas todavía. Comprueba la conexión.",12,MUTED,false);
+        LinearLayout log=panel();add(log,"ÚLTIMAS OPERACIONES",12,CYAN,true);
+        JSONArray trades=s.optJSONArray("trades");
+        if(trades==null||trades.length()==0)add(log,"Todavía no se han simulado operaciones.",12,MUTED,false);
+        else for(int i=0;i<Math.min(12,trades.length());i++){
+            JSONObject t=trades.optJSONObject(i);if(t==null)continue;String type=t.optString("type");
+            add(log,date(t.optLong("t"))+" · "+type+" · "+money(t.optDouble("usdc"))+("VENTA".equals(type)?" · +"+money(t.optDouble("profit")):""),11,
+                "VENTA".equals(type)?GREEN:"COMPRA".equals(type)?CYAN:AMBER,true);
+        }
+        log.addView(button("Compartir CSV de operaciones",0xFF2D4763,()->share(new GridEngine(this).csv())));
+        LinearLayout note=panel();
+        add(note,"AVISO DE FUNCIONAMIENTO",12,AMBER,true);
+        add(note,"Las compras y ventas son simuladas y usan velas de 1 minuto cerradas. La ejecución a precio de zona es una aproximación OHLC, no una orden real. Android puede suspender la supervisión; si falta histórico, se pausa para no inventar operaciones. No garantiza servicio continuo 24/7.",11,MUTED,false);
+        add(note,"Capital virtual inicial: "+money(s.optDouble("initial"))+" · Comisión por lado: 0,10 % · Sin apalancamiento",11,MUTED,false);
+    }
+    private void metric(LinearLayout parent,String title,String value,int col){
+        TextView t=text(title,11,MUTED,false);parent.addView(t);
+        TextView v=text(value,18,col,true);LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,-2);p.bottomMargin=dp(11);parent.addView(v,p);
+    }
+    private void start(){Intent i=new Intent(this,MarketService.class);i.setAction(MarketService.START);
+        try{if(Build.VERSION.SDK_INT>=26)startForegroundService(i);else startService(i);}catch(Exception e){toast(e.getMessage());}render();}
+    private void pause(){Intent i=new Intent(this,MarketService.class);i.setAction(MarketService.PAUSE);startService(i);render();}
+    private void confirmGap(){new AlertDialog.Builder(this).setTitle("Saltar un hueco no verificado")
+        .setMessage("Se retomará desde el minuto actual, sin atribuir operaciones al intervalo perdido. ¿Confirmas?")
+        .setPositiveButton("Confirmar",(d,w)->{Intent i=new Intent(this,MarketService.class);i.setAction(MarketService.GAP);startService(i);})
+        .setNegativeButton("Cancelar",null).show();}
+    private void capitalDialog(JSONObject s){inputDialog("Capital inicial virtual","15000",n->{
+        try{new GridEngine(this).configure(n);render();}catch(Exception e){toast(e.getMessage());}
+    });}
+    private void addDialog(JSONObject s){
+        JSONObject advice=s.optJSONObject("advice");double val=advice==null?300:advice.optDouble("suggested",300);
+        inputDialog("Aportación virtual (requiere autorización)",num(val>0?val:300,0).replace(".",""),n->{
+            new AlertDialog.Builder(this).setTitle("Confirmar aportación SIMULADA")
+                .setMessage("Añadir "+money(n)+" al saldo virtual de USDC. No realiza ningún cargo ni compra real.")
+                .setPositiveButton("Autorizar",(d,w)->{Intent i=new Intent(this,MarketService.class);i.setAction(MarketService.ADD);i.putExtra("amount",n);
+                    startService(i);})
+                .setNegativeButton("Cancelar",null).show();
+        });
+    }
+    private interface AmountCallback{void accept(double amount);}
+    private void inputDialog(String title,String initial,AmountCallback cb){
+        EditText edit=new EditText(this);edit.setInputType(InputType.TYPE_CLASS_NUMBER|InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        edit.setText(initial);edit.setSelectAllOnFocus(true);
+        new AlertDialog.Builder(this).setTitle(title).setView(edit)
+            .setPositiveButton("Continuar",(d,w)->{try{double n=Double.parseDouble(edit.getText().toString().replace(',','.').trim());
+                if(n<=0||!Double.isFinite(n))throw new IllegalArgumentException();cb.accept(n);
+            }catch(Exception e){toast("Introduce un número positivo válido");}})
+            .setNegativeButton("Cancelar",null).show();
+    }
+    private void share(String data){Intent i=new Intent(Intent.ACTION_SEND);i.setType("text/plain");i.putExtra(Intent.EXTRA_TEXT,data);
+        i.putExtra(Intent.EXTRA_SUBJECT,"FluidGrid · operaciones CSV");startActivity(Intent.createChooser(i,"Compartir historial"));}
+    private void toast(String t){Toast.makeText(this,t,Toast.LENGTH_LONG).show();}
+}
