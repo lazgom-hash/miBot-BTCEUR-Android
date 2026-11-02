@@ -125,9 +125,37 @@ public final class GridEngine {
          .put("nearestDemand",near?nearest.top:0).put("oldTp",oldTp).put("scenarioTp",lowerTp);
         return x;
     }
-    private void record(long t,String type,double price,double btc,double usdc,double profit,String note){
-        JSONObject x=new JSONObject();try{x.put("t",t).put("type",type).put("price",price).put("btc",btc).put("usdc",usdc).put("profit",profit).put("note",note);}catch(Exception ignored){}
+    private JSONObject record(long t,String type,double price,double btc,double usdc,double profit,String note){
+        JSONObject x=new JSONObject();
+        long seq=state.optLong("tradeSeq",0)+1;
+        try{state.put("tradeSeq",seq);
+            x.put("seq",seq).put("t",t).put("type",type).put("price",price).put("btc",btc)
+                .put("usdc",usdc).put("profit",profit).put("note",note);
+        }catch(Exception ignored){}
         trades.add(0,x);while(trades.size()>400)trades.remove(trades.size()-1);
+        return x;
+    }
+    private void recordTrade(long t,String type,double price,double btc,double usdc,double profit,String note,
+                             double cashAfter,double btcAfter){
+        JSONObject x=record(t,type,price,btc,usdc,profit,note);
+        try{x.put("balanceCash",cashAfter).put("balanceBtc",btcAfter);}catch(Exception ignored){}
+    }
+    /** Persistent notification outbox. Old v1.0 entries have no sequence and will not replay. */
+    public synchronized JSONArray pendingTradeNotifications(){
+        long delivered=state.optLong("lastNotifiedTradeSeq",0);
+        JSONArray result=new JSONArray();
+        for(int i=trades.size()-1;i>=0;i--){
+            JSONObject t=trades.get(i);
+            if(t.optLong("seq")>delivered &&
+                ("COMPRA".equals(t.optString("type"))||"VENTA".equals(t.optString("type")))) result.put(t);
+        }
+        return result;
+    }
+    public synchronized void acknowledgeTradeNotification(long seq){
+        if(seq>state.optLong("lastNotifiedTradeSeq",0) && seq<=state.optLong("tradeSeq",0)){
+            try{state.put("lastNotifiedTradeSeq",seq);}catch(Exception ignored){}
+            save();
+        }
     }
     private List<Bar> getBars(String market,String interval,int maxPages,long oldestWanted)throws Exception{
         List<Bar> all=new ArrayList<>();long cursor=0;
@@ -218,7 +246,7 @@ public final class GridEngine {
             if(profit+1e-8<allocated*.01)continue;
             btc-=q;cost-=allocated;cash+=proceeds;sold.add(z.id);
             try{state.put("realized",state.optDouble("realized",0)+profit);}catch(Exception ignored){}
-            record(m.t+MINUTE,"VENTA",z.bottom,q,proceeds,profit,"Supply "+z.id+" · TP neto ≥ 1 %");
+            recordTrade(m.t+MINUTE,"VENTA",z.bottom,q,proceeds,profit,"Supply "+z.id+" · TP neto ≥ 1 %",cash,btc);
         }
         double base=state.optDouble("initial",15000)+state.optDouble("injected",0)+state.optDouble("realized",0);
         double amount=base*state.optDouble("fraction",.1);
@@ -226,7 +254,7 @@ public final class GridEngine {
             if(!"demand".equals(z.type)||!z.active(m.t)||purchased.contains(z.id)||m.l>z.top||m.h<z.bottom)continue;
             if(cash+1e-7<amount)continue;
             double q=amount*(1-fee)/z.top;btc+=q;cost+=amount;cash-=amount;purchased.add(z.id);
-            record(m.t+MINUTE,"COMPRA",z.top,q,amount,0,"Demand "+z.id+" · 10 % base del bot");
+            recordTrade(m.t+MINUTE,"COMPRA",z.top,q,amount,0,"Demand "+z.id+" · 10 % base del bot",cash,btc);
         }
         try{state.put("btc",Math.max(0,btc)).put("cost",Math.max(0,cost)).put("cash",Math.max(0,cash)).put("lastMinute",m.t);}catch(Exception ignored){}
     }
