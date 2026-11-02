@@ -79,7 +79,8 @@ public final class GridEngine {
             copy.put("zones",z);
             double price=state.optDouble("lastPrice",0),btc=state.optDouble("btc",0),cash=state.optDouble("cash",0),cost=state.optDouble("cost",0),fee=state.optDouble("fee",.001);
             double equity=cash+(btc>0?btc*price*(1-fee):0);
-            copy.put("equity",equity).put("unrealized",btc*price*(1-fee)-cost);
+            copy.put("equity",equity).put("unrealized",btc*price*(1-fee)-cost)
+                .put("stale",state.optLong("lastUpdate",0)==0 || System.currentTimeMillis()-state.optLong("lastUpdate",0)>3*MINUTE);
             copy.put("average",btc>0?cost/btc:0);
             copy.put("target",btc>0?cost*1.01/(btc*(1-fee)):0);
             copy.put("advice",makeAdvice(price,cash,btc,cost,fee));
@@ -239,6 +240,8 @@ public final class GridEngine {
             if(zones.isEmpty()||System.currentTimeMillis()-zonesRefreshed>10*MINUTE){
                 List<Bar> hourly=getBars(m,"1H",5,0);
                 if(hourly.size()<100)throw new IllegalStateException("Faltan velas horarias suficientes para calcular zonas");
+                for(int i=1;i<hourly.size();i++)if(hourly.get(i).t-hourly.get(i-1).t!=HOUR)
+                    throw new IllegalStateException("Faltan horas en el histórico. Se bloquea el cálculo para evitar zonas incorrectas.");
                 createZones(hourly);zonesRefreshed=System.currentTimeMillis();
             }
             long last=state.optLong("lastMinute",0),wanted=last==0?System.currentTimeMillis()-20*MINUTE:last;
