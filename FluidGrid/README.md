@@ -25,3 +25,9 @@ No se debe utilizar para decisiones de inversión sin verificar los datos y resu
 El motor es una adaptación independiente del indicador SMC Lite publicado por **Pmgjiv** bajo licencia MPL 2.0. Se conserva el reconocimiento del autor. Las zonas se aproximan a las originales; faltan pruebas comparativas de paridad vela a vela con TradingView.
 
 Repositorio: no añadir credenciales ni claves reales de OKX. La app no necesita ninguna.
+
+## 1.1 — Avisos de operaciones
+- Canal Android de compras simuladas y otro de ventas, ambos de prioridad alta; permisos Android 13+.
+- Detalle de precio, USDC, BTC, saldos después de la operación y beneficio neto realizado al vender.
+- Cada evento se identifica mediante secuencia persistente para no duplicar avisos al reiniciar; las operaciones recuperadas se señalan como históricas.
+- Se pueden silenciar las notificaciones por tipo desde Ajustes de Android. La app no envía órdenes reales.
