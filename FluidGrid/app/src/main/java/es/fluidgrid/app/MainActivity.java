@@ -59,7 +59,7 @@ public final class MainActivity extends Activity {
         TextView t=text(value,size,color,bold);LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,-2);p.bottomMargin=dp(6);parent.addView(t,p);
     }
     private Button button(String label,int color,Runnable action){
-        Button b=new Button(this);b.setText(label);b.setTextAllCaps(false);b.setTextColor(WHITE);
+        Button b=new Button(this);b.setText(label);b.setAllCaps(false);b.setTextColor(WHITE);
         GradientDrawable d=new GradientDrawable();d.setColor(color);d.setCornerRadius(dp(10));b.setBackground(d);
         b.setOnClickListener(v->action.run());return b;
     }
