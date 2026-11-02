@@ -73,7 +73,8 @@ public final class MainActivity extends Activity {
         LinearLayout hero=panel();
         String market=s.optString("market","BTC-USDC");add(hero,market+(s.optBoolean("proxy")?" · referencia USD (no USDC)":""),13,CYAN,true);
         add(hero,s.optDouble("lastPrice")>0?num(s.optDouble("lastPrice"),2)+" USD":"Sin cotización verificada",27,WHITE,true);
-        add(hero,s.optString("status","Preparado"),12,s.optBoolean("blocked")?RED:MUTED,false);
+        add(hero,s.optString("status","Preparado"),12,s.optBoolean("blocked")||s.optBoolean("stale")?AMBER:MUTED,false);
+        if(s.optBoolean("stale")&&s.optBoolean("started"))add(hero,"Aviso: sin cotización reciente verificada. Revisa si Android ha suspendido la supervisión.",11,RED,true);
         add(hero,"Última actualización: "+date(s.optLong("lastUpdate")),11,MUTED,false);
         LinearLayout buttons=new LinearLayout(this);buttons.setOrientation(LinearLayout.HORIZONTAL);
         boolean started=s.optBoolean("started"),paused=s.optBoolean("paused");
