@@ -12,6 +12,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.app.NotificationManager;
+import android.provider.Settings;
+import android.net.Uri;
 import android.text.InputType;
 import android.view.Gravity;
 import android.view.View;
@@ -86,6 +89,20 @@ public final class MainActivity extends Activity {
             add(hero,"Se ha detectado un hueco de mercado. No se simulan operaciones durante datos no verificables.",12,RED,true);
             hero.addView(button("Aceptar hueco y retomar desde ahora",0xFF694F21,()->confirmGap()));
         }
+        LinearLayout alerts=panel();add(alerts,"AVISOS DE COMPRA Y VENTA",12,CYAN,true);
+        NotificationManager nm=getSystemService(NotificationManager.class);
+        boolean permission=Build.VERSION.SDK_INT<33 || checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)==PackageManager.PERMISSION_GRANTED;
+        add(alerts,permission && nm.areNotificationsEnabled()?"Notificaciones permitidas":"Avisos desactivados: autoriza las notificaciones",
+            13,permission && nm.areNotificationsEnabled()?GREEN:AMBER,true);
+        add(alerts,"Cada COMPRA y VENTA simulada genera un aviso individual, con precio, importe, BTC, saldo USDC y beneficio neto de la venta. Las operaciones recuperadas aparecen fechadas como históricas.",11,MUTED,false);
+        alerts.addView(button("Configurar notificaciones",0xFF25517B,()->{
+            if(Build.VERSION.SDK_INT>=33 && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)!=PackageManager.PERMISSION_GRANTED){
+                requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS},501);
+            } else {
+                Intent i=new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS);
+                i.putExtra(Settings.EXTRA_APP_PACKAGE,getPackageName());startActivity(i);
+            }
+        }));
         LinearLayout metrics=panel();add(metrics,"PATRIMONIO Y BALANCES",12,CYAN,true);
         metric(metrics,"Patrimonio liquidable",money(s.optDouble("equity")),WHITE);
         metric(metrics,"USDC disponibles",money(s.optDouble("cash")),CYAN);
