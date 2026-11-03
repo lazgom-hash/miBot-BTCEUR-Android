@@ -38,13 +38,13 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp FluidGrid/app/build/outputs/apk/debug/app-debug.apk FluidGrid-1.3.apk
-          if gh release view fluidgrid-v1.3.0 >/dev/null 2>&1; then
-            gh release upload fluidgrid-v1.3.0 FluidGrid-1.3.apk --clobber
+          cp FluidGrid/app/build/outputs/apk/debug/app-debug.apk FluidGrid-1.5.apk
+          if gh release view fluidgrid-v1.5.0 >/dev/null 2>&1; then
+            gh release upload fluidgrid-v1.5.0 FluidGrid-1.5.apk --clobber
           else
-            gh release create fluidgrid-v1.3.0 FluidGrid-1.3.apk \
+            gh release create fluidgrid-v1.5.0 FluidGrid-1.5.apk \
               --target fluidgrid-android \
-              --title "FluidGrid 1.3 · Simulador Android" \
-              --notes "Instalador APK de pruebas. Simulación BTC spot; no utiliza fondos reales. Descarga FluidGrid-1.3.apk desde Assets." \
+              --title "FluidGrid 1.5 · Simulador Android" \
+              --notes "Instalador APK de pruebas. Gráfico interactivo, zonas lejanas y marcas de operaciones. Simulación BTC spot sin fondos reales. Descarga FluidGrid-1.5.apk desde Assets." \
               --prerelease
           fi
