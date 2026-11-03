@@ -27,6 +27,8 @@ public final class ChartView extends View {
     private static final int GREEN=0xFF36C6A4, RED=0xFFF27483, WHITE=0xFFF1F7FB;
     private static final int ZONE_GREEN=0x3530CBA9, ZONE_RED=0x35F06B82;
     private static final long HOUR=3_600_000L;
+    // Espacio libre a la derecha para distinguir las velas actuales del eje de precios.
+    private static final float FUTURE_EMPTY_BARS=8f;
     private static final class Candle {
         final long t; final double o,h,l,c;
         Candle(long t,double o,double h,double l,double c){this.t=t;this.o=o;this.h=h;this.l=l;this.c=c;}
@@ -198,7 +200,7 @@ public final class ChartView extends View {
         int end=Math.min(candles.size(),(int)Math.ceil(visibleFirst+n));
         if(end<=start)return;
         long firstTime=candles.get(start).t,lastTime=candles.get(end-1).t;
-        stepPx=width/Math.max(1,n);
+        stepPx=width/Math.max(1f,n+FUTURE_EMPTY_BARS);
         double lo=Double.POSITIVE_INFINITY,hi=Double.NEGATIVE_INFINITY;
         for(int i=start;i<end;i++){
             Candle v=candles.get(i);lo=Math.min(lo,v.l);hi=Math.max(hi,v.h);
@@ -278,6 +280,9 @@ public final class ChartView extends View {
         label.setColor(TEXT);label.setTextSize(dp(10));
         c.drawText(time(firstTime),left,bottom+dp(16),label);
         String endLabel=time(lastTime);float endW=label.measureText(endLabel);
-        c.drawText(endLabel,right-endW,bottom+dp(16),label);
+        // La última marca temporal acompaña a la última vela, no al borde del eje.
+        float lastCandleX=left+stepPx*(end-visibleFirst-.5f);
+        float endLabelX=Math.max(left+dp(60),Math.min(right-endW-dp(2),lastCandleX-endW*.5f));
+        c.drawText(endLabel,endLabelX,bottom+dp(16),label);
     }
 }
