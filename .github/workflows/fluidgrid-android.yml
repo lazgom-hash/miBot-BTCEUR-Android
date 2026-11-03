@@ -25,8 +25,27 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
+      - name: Preparar clave de firma estable
+        env:
+          FLUIDGRID_KEYSTORE_B64: ${{ secrets.FLUIDGRID_KEYSTORE_B64 }}
+          FLUIDGRID_STORE_PASS: ${{ secrets.FLUIDGRID_STORE_PASS }}
+          FLUIDGRID_KEY_PASS: ${{ secrets.FLUIDGRID_KEY_PASS }}
+          FLUIDGRID_KEY_ALIAS: ${{ secrets.FLUIDGRID_KEY_ALIAS }}
+        run: |
+          if [ -n "$FLUIDGRID_KEYSTORE_B64" ] && [ -n "$FLUIDGRID_STORE_PASS" ] && [ -n "$FLUIDGRID_KEY_PASS" ] && [ -n "$FLUIDGRID_KEY_ALIAS" ]; then
+            mkdir -p FluidGrid/app/signing
+            printf '%s' "$FLUIDGRID_KEYSTORE_B64" | base64 -d > FluidGrid/app/signing/fluidgrid-upload.jks
+            echo "FLUIDGRID_KEYSTORE_PATH=$GITHUB_WORKSPACE/FluidGrid/app/signing/fluidgrid-upload.jks" >> "$GITHUB_ENV"
+            echo "Firma estable: configurada"
+          else
+            echo "::warning::Firma estable NO configurada. APK debug: futuras actualizaciones pueden exigir reinstalación."
+          fi
       - name: Compilar APK de pruebas
         working-directory: FluidGrid
+        env:
+          FLUIDGRID_STORE_PASS: ${{ secrets.FLUIDGRID_STORE_PASS }}
+          FLUIDGRID_KEY_PASS: ${{ secrets.FLUIDGRID_KEY_PASS }}
+          FLUIDGRID_KEY_ALIAS: ${{ secrets.FLUIDGRID_KEY_ALIAS }}
         run: gradle --no-daemon :app:assembleDebug
       - uses: actions/upload-artifact@v4
         with:
@@ -38,13 +57,13 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp FluidGrid/app/build/outputs/apk/debug/app-debug.apk FluidGrid-1.6.apk
-          if gh release view fluidgrid-v1.6.0 >/dev/null 2>&1; then
-            gh release upload fluidgrid-v1.6.0 FluidGrid-1.6.apk --clobber
+          cp FluidGrid/app/build/outputs/apk/debug/app-debug.apk FluidGrid-1.7.apk
+          if gh release view fluidgrid-v1.7.0 >/dev/null 2>&1; then
+            gh release upload fluidgrid-v1.7.0 FluidGrid-1.7.apk --clobber
           else
-            gh release create fluidgrid-v1.6.0 FluidGrid-1.6.apk \
+            gh release create fluidgrid-v1.7.0 FluidGrid-1.7.apk \
               --target fluidgrid-android \
-              --title "FluidGrid 1.6 · Simulador Android" \
-              --notes "Instalador APK de pruebas. Gráfico interactivo: desplazamiento con un dedo, zoom con dos dedos y controles +/-. Simulación BTC spot sin fondos reales. Descarga FluidGrid-1.6.apk desde Assets." \
+              --title "FluidGrid 1.7 · Testador BIN y actualizaciones" \
+              --notes "Instalador APK de pruebas. Testador offline BIN histórico y comprobador de actualizaciones GitHub. Simulación BTC spot sin fondos reales. Descarga FluidGrid-1.7.apk desde Assets." \
               --prerelease
           fi
