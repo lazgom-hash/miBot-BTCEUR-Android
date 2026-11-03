@@ -24,6 +24,9 @@ import java.util.Set;
 public final class GridEngine {
     private static final long MINUTE = 60_000L, HOUR = 3_600_000L;
     private static final int PAGE_LIMIT = 300, MAX_CATCHUP_MINUTES = 10_080;
+    // TradingView screenshot: FluidTrades SMC Lite 5 / 20 / 5 (swing / history / box width).
+    private static final int SWING_LENGTH = 5, ZONE_HISTORY = 20, ATR_LENGTH = 50;
+    private static final double BOX_WIDTH = 5.0;
     private static final String STORAGE = "fluidgrid_native_v1", STATE = "state";
     private final SharedPreferences prefs;
     private final List<Zone> zones = new ArrayList<>();
@@ -89,7 +92,8 @@ public final class GridEngine {
         JSONArray z=new JSONArray();long n=System.currentTimeMillis();
         if(n-state.optLong("zonesCachedAt",0)<2*HOUR)for(Zone q:zones)if(q.active(n) && q.expires==Long.MAX_VALUE)z.put(q.json());
         try{
-            copy.put("zones",z);
+            copy.put("zones",z).put("fluidSwing", SWING_LENGTH).put("fluidHistory", ZONE_HISTORY)
+                .put("fluidBoxWidth", BOX_WIDTH).put("fluidAtr", ATR_LENGTH);
             JSONArray hb=new JSONArray();
             for(Bar b:recentHourly){JSONObject j=new JSONObject();j.put("t",b.t).put("o",b.o).put("h",b.h).put("l",b.l).put("c",b.c);hb.put(j);}
             copy.put("hourlyBars",hb);
@@ -221,24 +225,24 @@ public final class GridEngine {
         zones.clear();List<Zone> demand=new ArrayList<>(),supply=new ArrayList<>();double atr=0,initialTr=0;
         for(int i=0;i<h.size();i++){
             Bar b=h.get(i);double tr=i==0?b.h-b.l:Math.max(b.h-b.l,Math.max(Math.abs(b.h-h.get(i-1).c),Math.abs(b.l-h.get(i-1).c)));
-            if(i<50){initialTr+=tr;if(i==49)atr=initialTr/50;}else atr=(atr*49+tr)/50;
-            if(i>=49+20){
-                int pivot=i-10;Bar a=h.get(pivot);boolean high=true,low=true;
-                for(int j=pivot-10;j<=pivot+10;j++)if(j!=pivot){
+            if(i<ATR_LENGTH){initialTr+=tr;if(i==ATR_LENGTH-1)atr=initialTr/ATR_LENGTH;}else atr=(atr*(ATR_LENGTH-1)+tr)/ATR_LENGTH;
+            if(i>=ATR_LENGTH-1 && i>=SWING_LENGTH*2){
+                int pivot=i-SWING_LENGTH;Bar a=h.get(pivot);boolean high=true,low=true;
+                for(int j=pivot-SWING_LENGTH;j<=pivot+SWING_LENGTH;j++)if(j!=pivot){
                     if(h.get(j).h>a.h || (j>pivot && h.get(j).h==a.h))high=false;
                     if(h.get(j).l<a.l || (j>pivot && h.get(j).l==a.l))low=false;
                 }
                 if(high){
-                    double top=a.h,bottom=top-.25*atr,poi=(top+bottom)/2;
+                    double top=a.h,bottom=top-(BOX_WIDTH/10.0)*atr,poi=(top+bottom)/2;
                     if(!overlaps(supply,poi,atr,b.t+HOUR)){
                         Zone z=new Zone("S"+a.t,"supply",top,bottom,b.t+HOUR);zones.add(z);supply.add(0,z);
-                        if(supply.size()>20){Zone old=supply.remove(supply.size()-1);old.expires=b.t+HOUR;}
+                        if(supply.size()>ZONE_HISTORY){Zone old=supply.remove(supply.size()-1);old.expires=b.t+HOUR;}
                     }
                 }else if(low){
-                    double bottom=a.l,top=bottom+.25*atr,poi=(top+bottom)/2;
+                    double bottom=a.l,top=bottom+(BOX_WIDTH/10.0)*atr,poi=(top+bottom)/2;
                     if(!overlaps(demand,poi,atr,b.t+HOUR)){
                         Zone z=new Zone("D"+a.t,"demand",top,bottom,b.t+HOUR);zones.add(z);demand.add(0,z);
-                        if(demand.size()>20){Zone old=demand.remove(demand.size()-1);old.expires=b.t+HOUR;}
+                        if(demand.size()>ZONE_HISTORY){Zone old=demand.remove(demand.size()-1);old.expires=b.t+HOUR;}
                     }
                 }
             }
@@ -282,7 +286,7 @@ public final class GridEngine {
             double px=ticker.optDouble("last");if(!(px>0))throw new IllegalStateException("Cotización sin valor");
             state.put("lastPrice",px).put("lastUpdate",System.currentTimeMillis());
             if(zones.isEmpty()||System.currentTimeMillis()-zonesRefreshed>10*MINUTE){
-                List<Bar> hourly=getBars(m,"1H",5,0);
+                List<Bar> hourly=getBars(m,"1H",10,0);
                 if(hourly.size()<100)throw new IllegalStateException("Faltan velas horarias suficientes para calcular zonas");
                 for(int i=1;i<hourly.size();i++)if(hourly.get(i).t-hourly.get(i-1).t!=HOUR)
                     throw new IllegalStateException("Faltan horas en el histórico. Se bloquea el cálculo para evitar zonas incorrectas.");
