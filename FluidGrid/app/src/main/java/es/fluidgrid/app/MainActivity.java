@@ -4,6 +4,8 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.database.Cursor;
+import android.provider.OpenableColumns;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -12,9 +14,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.net.Uri;
+import android.text.TextUtils;
 import android.app.NotificationManager;
 import android.provider.Settings;
-import android.net.Uri;
 import android.text.InputType;
 import android.view.Gravity;
 import android.view.View;
@@ -30,6 +33,11 @@ import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
+import java.text.SimpleDateFormat;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -43,6 +51,20 @@ public final class MainActivity extends Activity {
     private ChartView chartView;
     private boolean showFarZones=false;
     private boolean active=false;
+    private static final int REQUEST_BIN=1707;
+    private final ExecutorService testExecutor=Executors.newSingleThreadExecutor();
+    private final AtomicBoolean cancelTest=new AtomicBoolean(false);
+    private volatile boolean testRunning=false;
+    private volatile int testPercent=0;
+    private volatile long testRows=0;
+    private String testFileName="";
+    private JSONObject testReport;
+    private ProgressBar testProgressView;
+    private TextView testProgressLabel;
+    private String updateState="No se ha comprobado todavía.";
+    private String updateUrl="";
+    private String latestVersion="";
+    private boolean updateChecking=false;
     private final Runnable redraw=new Runnable(){@Override public void run(){if(active){if(chartView==null||!chartView.isInteracting())render();handler.postDelayed(this,20000);}}};
     @Override public void onCreate(Bundle state){super.onCreate(state);
         if(Build.VERSION.SDK_INT>=33 && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)!=PackageManager.PERMISSION_GRANTED)
@@ -52,6 +74,8 @@ public final class MainActivity extends Activity {
         showFarZones=getSharedPreferences("fluidgrid_ui",MODE_PRIVATE).getBoolean("farZones",false);
         chartView=new ChartView(this);chartView.setShowFarZones(showFarZones);
         scroll.addView(body);setContentView(scroll);
+        try{testReport=new JSONObject(getSharedPreferences("fluidgrid_backtests",MODE_PRIVATE).getString("last_report","{}"));}catch(Exception ignored){}
+        checkForUpdates();
     }
     @Override protected void onResume(){super.onResume();active=true;handler.removeCallbacks(redraw);redraw.run();}
     @Override protected void onPause(){active=false;handler.removeCallbacks(redraw);super.onPause();}
@@ -110,6 +134,12 @@ public final class MainActivity extends Activity {
         Button stop=button("⏸ Pausar",0xFF51425F,()->pause());
         LinearLayout.LayoutParams half=new LinearLayout.LayoutParams(0,dp(48),1);half.setMargins(0,0,dp(5),0);buttons.addView(play,half);buttons.addView(stop,new LinearLayout.LayoutParams(0,dp(48),1));hero.addView(buttons);
         if(!started){Button setup=button("Configurar capital inicial",0xFF25517B,()->capitalDialog(s));hero.addView(setup);}
+        LinearLayout updates=panel();add(updates,"VERSIÓN Y ACTUALIZACIONES",12,CYAN,true);
+        metric(updates,"Versión instalada",versionName(),WHITE);
+        add(updates,updateChecking?"Consultando versiones publicadas en GitHub…":updateState,12,updateUrl.isEmpty()?MUTED:GREEN,false);
+        updates.addView(button(updateChecking?"Comprobando…":"Buscar actualizaciones",0xFF245277,()->checkForUpdates()));
+        if(!updateUrl.isEmpty())updates.addView(button("Descargar FluidGrid "+latestVersion,0xFF176F65,()->openDownload()));
+        add(updates,"La descarga se realiza desde GitHub y Android debe autorizar la instalación. La actualización sin desinstalar requiere conservar el mismo identificador y certificado de firma.",10,MUTED,false);
         if(s.optBoolean("blocked")){
             add(hero,"Se ha detectado un hueco de mercado. No se simulan operaciones durante datos no verificables.",12,RED,true);
             hero.addView(button("Aceptar hueco y retomar desde ahora",0xFF694F21,()->confirmGap()));
@@ -181,6 +211,37 @@ public final class MainActivity extends Activity {
         add(chart,"Un dedo dentro del gráfico: desplazar velas. Dos dedos: zoom. Para desplazarte por la pantalla, arrastra fuera del gráfico.",10,MUTED,false);
         add(chart,"▲ Compra simulada      ▼ Venta simulada      ┄ Precio actual",10,MUTED,false);
 
+        LinearLayout tester=panel();add(tester,"TESTADOR HISTÓRICO · ARCHIVO BIN",12,CYAN,true);
+        add(tester,"Selecciona un BIN BTCUSD de 1 minuto. Reproducirá FluidTrades 5/20/5 en BTC 1h sin alterar la cartera virtual activa.",11,MUTED,false);
+        tester.addView(button(testRunning?"Test en ejecución":"Elegir BIN y ejecutar test",0xFF196C80,()->chooseBin()));
+        if(testRunning)tester.addView(button("Cancelar test",0xFF69415A,()->cancelTest.set(true)));
+        testProgressView=new ProgressBar(this,null,android.R.attr.progressBarStyleHorizontal);
+        testProgressView.setMax(100);testProgressView.setProgress(testPercent);tester.addView(testProgressView,new LinearLayout.LayoutParams(-1,dp(8)));
+        testProgressLabel=text(testRunning?"Procesando "+num(testRows,0)+" velas · "+(testPercent<0?"Progreso desconocido":testPercent+" %"):(testFileName.isEmpty()?"Sin prueba ejecutándose":testFileName),11,MUTED,false);
+        tester.addView(testProgressLabel);
+        if(testReport!=null && testReport.optLong("records")>0){
+            add(tester,"RESULTADO DEL ÚLTIMO TEST",12,CYAN,true);
+            add(tester,"Periodo: "+dayUTC(testReport.optLong("start"))+" – "+dayUTC(testReport.optLong("end"))+" · "+num(testReport.optDouble("records"),0)+" velas",11,MUTED,false);
+            metric(tester,"Patrimonio liquidable final",money(testReport.optDouble("equity")),WHITE);
+            metric(tester,"Beneficio neto de la cartera",money(testReport.optDouble("profitNet")),testReport.optDouble("profitNet")>=0?GREEN:RED);
+            metric(tester,"Beneficios realizados",money(testReport.optDouble("realized")),GREEN);
+            metric(tester,"Resultado latente",money(testReport.optDouble("unrealized")),testReport.optDouble("unrealized")>=0?GREEN:RED);
+            metric(tester,"USDC disponibles",money(testReport.optDouble("cash")),CYAN);
+            metric(tester,"BTC acumulados",num(testReport.optDouble("btc"),8)+" BTC",WHITE);
+            metric(tester,"Compras / ventas simuladas",testReport.optInt("buyCount")+" / "+testReport.optInt("sellCount"),WHITE);
+            metric(tester,"Meses con ganancias realizadas",testReport.optInt("positiveMonths")+" de "+testReport.optInt("monthsCount"),WHITE);
+            metric(tester,"Mayor racha sin beneficios",testReport.optInt("maxDryMonths")+" meses",AMBER);
+            metric(tester,"Drawdown máximo (cierres de minuto)",num(testReport.optDouble("maxDrawdown"),2)+" %",RED);
+            metric(tester,"Comisiones totales estimadas",money(testReport.optDouble("fees")),MUTED);
+            add(tester,"RESULTADOS MENSUALES · últimos 12 meses",11,CYAN,true);
+            JSONArray m=testReport.optJSONArray("monthly");
+            if(m!=null)for(int i=Math.max(0,m.length()-12);i<m.length();i++){
+                JSONObject q=m.optJSONObject(i);if(q==null)continue;
+                double profit=q.optDouble("profit");add(tester,q.optString("month")+" · "+money(profit)+" · "+q.optInt("sells")+" ventas",11,profit>0?GREEN:MUTED,false);
+            }
+            tester.addView(button("Compartir todos los meses (CSV)",0xFF30425A,()->share(BinBacktester.monthlyCsv(testReport))));
+            add(tester,"El BIN representa BTC/USD, no necesariamente precios ejecutables BTC/USDC. El test aplica comisiones del 0,10 % por lado, sin deslizamiento ni aportaciones. Solo confirma zonas después de disponer de las velas necesarias.",10,MUTED,false);
+        }
         LinearLayout z=panel();add(z,"ZONAS ACTIVAS · 1H · 5/20/5",12,CYAN,true);
         JSONArray zones=s.optJSONArray("zones");int count=0;
         if(zones!=null)for(int i=0;i<zones.length();i++){
@@ -239,5 +300,77 @@ public final class MainActivity extends Activity {
     }
     private void share(String data){Intent i=new Intent(Intent.ACTION_SEND);i.setType("text/plain");i.putExtra(Intent.EXTRA_TEXT,data);
         i.putExtra(Intent.EXTRA_SUBJECT,"FluidGrid · operaciones CSV");startActivity(Intent.createChooser(i,"Compartir historial"));}
+
+    private String dayUTC(long seconds){
+        SimpleDateFormat f=new SimpleDateFormat("dd/MM/yyyy",new Locale("es","ES"));
+        f.setTimeZone(TimeZone.getTimeZone("UTC"));return seconds>0?f.format(new Date(seconds*1000)):"—";
+    }
+    private void chooseBin(){
+        if(testRunning){toast("Hay un test en curso");return;}
+        Intent i=new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        i.addCategory(Intent.CATEGORY_OPENABLE);
+        i.setType("*/*");
+        try{startActivityForResult(i,REQUEST_BIN);}catch(Exception e){toast("No se pudo abrir el selector de archivos");}
+    }
+    @Override protected void onActivityResult(int requestCode,int resultCode,Intent data){
+        super.onActivityResult(requestCode,resultCode,data);
+        if(requestCode!=REQUEST_BIN||resultCode!=RESULT_OK||data==null||data.getData()==null)return;
+        Uri uri=data.getData();String name="histórico.bin";long size=-1;
+        try(Cursor cursor=getContentResolver().query(uri,new String[]{OpenableColumns.DISPLAY_NAME,OpenableColumns.SIZE},null,null,null)){
+            if(cursor!=null&&cursor.moveToFirst()){
+                int a=cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME),b=cursor.getColumnIndex(OpenableColumns.SIZE);
+                if(a>=0)name=cursor.getString(a);if(b>=0&&!cursor.isNull(b))size=cursor.getLong(b);
+            }
+        }catch(Exception ignored){}
+        if(!name.toLowerCase(Locale.ROOT).endsWith(".bin")){toast("Selecciona un archivo .bin compatible");return;}
+        final String selectedName=name;
+        final long selectedSize=size;
+        inputDialog("Capital virtual para el backtest",num(new GridEngine(this).snapshot().optDouble("initial",15000),0).replace(".",""),n->runBacktest(uri,selectedName,selectedSize,n));
+    }
+    private void runBacktest(Uri uri,String name,long size,double capital){
+        if(testRunning)return;
+        testRunning=true;cancelTest.set(false);testPercent=0;testRows=0;
+        testFileName=name+" · ejecutando";
+        render();
+        testExecutor.execute(()->{
+            try{
+                BinBacktester engine=new BinBacktester(capital);
+                JSONObject result=engine.run(getContentResolver(),uri,size,(percent,rows)->runOnUiThread(()->{
+                    if(!testRunning)return;
+                    testPercent=percent;testRows=rows;
+                    if(testProgressView!=null){testProgressView.setIndeterminate(percent<0);if(percent>=0)testProgressView.setProgress(percent);}
+                    if(testProgressLabel!=null)testProgressLabel.setText(name+" · "+num(rows,0)+" velas · "+(percent<0?"leyendo":percent+" %"));
+                }),cancelTest);
+                runOnUiThread(()->{
+                    testRunning=false;testPercent=100;testReport=result;testFileName=name+" · finalizado";
+                    getSharedPreferences("fluidgrid_backtests",MODE_PRIVATE).edit().putString("last_report",result.toString()).apply();
+                    render();
+                });
+            }catch(Exception e){
+                runOnUiThread(()->{
+                    testRunning=false;testFileName=cancelTest.get()?"Test cancelado":"Error en "+name+": "+e.getMessage();
+                    toast(testFileName);render();
+                });
+            }
+        });
+    }
+    private void checkForUpdates(){
+        if(updateChecking)return;
+        updateChecking=true;updateState="Comprobando actualizaciones…";
+        if(active)render();
+        UpdateChecker.check(this,result->{
+            updateChecking=false;updateState=result.message;
+            updateUrl=result.newer?result.downloadUrl:"";
+            latestVersion=result.newer?result.version:"";
+            if(active)render();
+        });
+    }
+    private void openDownload(){
+        if(!updateUrl.startsWith("https://github.com/lazgom-hash/miBot-BTCEUR-Android/releases/download/"))return;
+        try{startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse(updateUrl)));}catch(Exception e){toast("No se pudo abrir GitHub en el navegador");}
+    }
+    @Override protected void onDestroy(){
+        cancelTest.set(true);testExecutor.shutdownNow();handler.removeCallbacks(redraw);super.onDestroy();
+    }
     private void toast(String t){Toast.makeText(this,t,Toast.LENGTH_LONG).show();}
 }
