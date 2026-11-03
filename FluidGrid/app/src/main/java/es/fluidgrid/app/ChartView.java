@@ -123,7 +123,7 @@ public final class ChartView extends View {
                 if(!horizontalDrag && Math.abs(totalX)>dp(8) && Math.abs(totalX)>1.15f*Math.abs(totalY))horizontalDrag=true;
                 if(horizontalDrag){
                     getParent().requestDisallowInterceptTouchEvent(true);
-                    offsetBars-=dx/Math.max(dp(3),stepPx);clampOffset();invalidate();
+                    offsetBars+=dx/Math.max(dp(3),stepPx);clampOffset();invalidate();
                 }
                 lastX=e.getX();return true;
             case MotionEvent.ACTION_CANCEL:
