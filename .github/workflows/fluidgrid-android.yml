@@ -2,7 +2,7 @@ name: FluidGrid Android APK
 on:
   push:
     branches: [fluidgrid-android]
-    paths: ['FluidGrid/**', '.github/workflows/fluidgrid-android.yml']
+    paths: ['FluidGrid/**', 'downloads/FluidGrid-1.8.apk', '.github/workflows/fluidgrid-android.yml']
   pull_request:
     branches: [main]
     paths: ['FluidGrid/**', '.github/workflows/fluidgrid-android.yml']
@@ -52,18 +52,28 @@ jobs:
           name: FluidGrid-debug-APK
           path: FluidGrid/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
-      - name: Publicar APK descargable sin iniciar sesión
-        if: (github.event_name == 'push' && github.ref == 'refs/heads/fluidgrid-android') || (github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'fluidgrid-android' && github.event.pull_request.head.repo.full_name == github.repository)
+      - name: Publicar únicamente la APK firmada con el certificado permanente
+        if: github.event_name != 'workflow_dispatch'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp FluidGrid/app/build/outputs/apk/debug/app-debug.apk FluidGrid-1.7.apk
-          if gh release view fluidgrid-v1.7.0 >/dev/null 2>&1; then
-            gh release upload fluidgrid-v1.7.0 FluidGrid-1.7.apk --clobber
+          SIGNED_APK=downloads/FluidGrid-1.8.apk
+          if [ ! -f "$SIGNED_APK" ]; then
+            echo "Todavía no se ha incorporado la APK con firma estable."
+            exit 0
+          fi
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --min-sdk-version 26 --print-certs "$SIGNED_APK" > /tmp/fluidgrid-cert-info.txt
+          if ! grep -qi '8d765b13774533c13281677f918de3b578b3d786f7cc24dfc8314f909d9def1b' /tmp/fluidgrid-cert-info.txt; then
+            echo "::error::El certificado de firma no coincide con el certificado permanente de FluidGrid."
+            exit 1
+          fi
+          echo "Firma de APK confirmada por Android SDK y huella SHA-256 fijada."
+          if gh release view fluidgrid-v1.8.0 >/dev/null 2>&1; then
+            gh release upload fluidgrid-v1.8.0 "$SIGNED_APK" --clobber
           else
-            gh release create fluidgrid-v1.7.0 FluidGrid-1.7.apk \
+            gh release create fluidgrid-v1.8.0 "$SIGNED_APK" \
               --target fluidgrid-android \
-              --title "FluidGrid 1.7 · Testador BIN y actualizaciones" \
-              --notes "Instalador APK de pruebas. Testador offline BIN histórico y comprobador de actualizaciones GitHub. Simulación BTC spot sin fondos reales. Descarga FluidGrid-1.7.apk desde Assets." \
+              --title "FluidGrid 1.8 · Firma permanente" \
+              --notes "Aplicación firmada con certificado permanente. No incluye claves privadas. Versión 1.7 anterior requiere reinstalación única por cambio de certificado." \
               --prerelease
           fi
