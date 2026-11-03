@@ -292,7 +292,7 @@ public final class GridEngine {
                     throw new IllegalStateException("Faltan horas en el histórico. Se bloquea el cálculo para evitar zonas incorrectas.");
                 createZones(hourly);zonesRefreshed=System.currentTimeMillis();
                 recentHourly.clear();
-                int from=Math.max(0,hourly.size()-240);
+                int from=Math.max(0,hourly.size()-720);
                 for(int k=from;k<hourly.size();k++)recentHourly.add(hourly.get(k));
             }
             long last=state.optLong("lastMinute",0),wanted=last==0?System.currentTimeMillis()-20*MINUTE:last;
