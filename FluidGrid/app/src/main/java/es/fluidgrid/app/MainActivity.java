@@ -18,6 +18,7 @@ import android.net.Uri;
 import android.text.InputType;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -38,14 +39,19 @@ public final class MainActivity extends Activity {
         CYAN=0xFF69D8E0,GREEN=0xFF59D9A3,RED=0xFFFF888D,AMBER=0xFFFFCA75;
     private final Handler handler=new Handler(Looper.getMainLooper());
     private LinearLayout body;
+    private ScrollView scroll;
+    private ChartView chartView;
+    private boolean showFarZones=false;
     private boolean active=false;
-    private final Runnable redraw=new Runnable(){@Override public void run(){if(active){render();handler.postDelayed(this,5000);}}};
+    private final Runnable redraw=new Runnable(){@Override public void run(){if(active){if(chartView==null||!chartView.isInteracting())render();handler.postDelayed(this,20000);}}};
     @Override public void onCreate(Bundle state){super.onCreate(state);
         if(Build.VERSION.SDK_INT>=33 && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)!=PackageManager.PERMISSION_GRANTED)
             requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS},501);
-        ScrollView sc=new ScrollView(this);sc.setFillViewport(true);sc.setBackgroundColor(BG);
+        scroll=new ScrollView(this);scroll.setFillViewport(true);scroll.setBackgroundColor(BG);
         body=new LinearLayout(this);body.setOrientation(LinearLayout.VERTICAL);body.setPadding(dp(14),dp(18),dp(14),dp(40));
-        sc.addView(body);setContentView(sc);
+        showFarZones=getSharedPreferences("fluidgrid_ui",MODE_PRIVATE).getBoolean("farZones",false);
+        chartView=new ChartView(this);chartView.setShowFarZones(showFarZones);
+        scroll.addView(body);setContentView(scroll);
     }
     @Override protected void onResume(){super.onResume();active=true;handler.removeCallbacks(redraw);redraw.run();}
     @Override protected void onPause(){active=false;handler.removeCallbacks(redraw);super.onPause();}
@@ -74,7 +80,11 @@ public final class MainActivity extends Activity {
         try{return getPackageManager().getPackageInfo(getPackageName(),0).versionName;}catch(Exception e){return "1.x";}
     }
     private void render(){
-        JSONObject s=new GridEngine(this).snapshot();body.removeAllViews();
+        JSONObject s=new GridEngine(this).snapshot();
+        final int priorScroll=scroll.getScrollY();
+        // Retain the ChartView instance: panning and zoom must survive screen refreshes.
+        if(chartView.getParent() instanceof ViewGroup)((ViewGroup)chartView.getParent()).removeView(chartView);
+        body.removeAllViews();
         add(body,"◈  FluidGrid",26,WHITE,true);
         add(body,"Versión "+versionName()+" · BTC spot · FluidTrades SMC Lite · 1 hora · simulación",11,MUTED,false);
         LinearLayout hero=panel();
@@ -140,12 +150,23 @@ public final class MainActivity extends Activity {
             if(advice.optDouble("scenarioTp")>0)metric(a,"TP si se compra otro tramo",num(advice.optDouble("scenarioTp"),2)+" USD",WHITE);
             add(a,"El consejo sigue reglas de liquidez. No predice el precio, ni compromete aportaciones reales.",10,MUTED,false);
         }
-        LinearLayout chart=panel();add(chart,"GRÁFICO BTC · 1H · FLUIDTRADES",12,CYAN,true);
-        add(chart,"FluidTrades: swing 5 · historial 20 · anchura 5 · ATR 50. Velas confirmadas OKX.",11,MUTED,false);
-        ChartView cv=new ChartView(this);
-        cv.setData(s.optJSONArray("hourlyBars"), s.optJSONArray("zones"));
-        LinearLayout.LayoutParams cp=new LinearLayout.LayoutParams(-1,dp(240));cp.bottomMargin=dp(8);
-        chart.addView(cv,cp);
+        LinearLayout chart=panel();add(chart,"BTC/USDC · 1H · FLUIDTRADES",13,CYAN,true);
+        add(chart,"5/20/5 · ATR 50 · zonas activas confirmadas de OKX",11,MUTED,false);
+        add(chart,"Desliza para ver velas · Pellizca para zoom · Doble toque para volver",10,MUTED,false);
+        chartView.setShowFarZones(showFarZones);
+        chartView.setData(s.optJSONArray("hourlyBars"),s.optJSONArray("zones"),s.optJSONArray("trades"),s.optDouble("lastPrice"));
+        LinearLayout.LayoutParams cp=new LinearLayout.LayoutParams(-1,dp(355));cp.bottomMargin=dp(5);
+        chart.addView(chartView,cp);
+        LinearLayout row=new LinearLayout(this);row.setOrientation(LinearLayout.HORIZONTAL);
+        Button toggle=button(showFarZones?"Ocultar zonas lejanas":"Mostrar zonas lejanas",0xFF245277,()->{
+            showFarZones=!showFarZones;
+            getSharedPreferences("fluidgrid_ui",MODE_PRIVATE).edit().putBoolean("farZones",showFarZones).apply();
+            chartView.setShowFarZones(showFarZones);render();
+        });
+        Button reset=button("Restablecer",0xFF30425A,()->{chartView.resetView();});
+        LinearLayout.LayoutParams p1=new LinearLayout.LayoutParams(0,dp(43),2);p1.setMargins(0,0,dp(7),0);
+        row.addView(toggle,p1);row.addView(reset,new LinearLayout.LayoutParams(0,dp(43),1));chart.addView(row);
+        add(chart,"▲ Compra simulada      ▼ Venta simulada      ┄ Precio actual",10,MUTED,false);
 
         LinearLayout z=panel();add(z,"ZONAS ACTIVAS · 1H · 5/20/5",12,CYAN,true);
         JSONArray zones=s.optJSONArray("zones");int count=0;
@@ -167,6 +188,7 @@ public final class MainActivity extends Activity {
         add(note,"AVISO DE FUNCIONAMIENTO",12,AMBER,true);
         add(note,"Las compras y ventas son simuladas y usan velas de 1 minuto cerradas. La ejecución a precio de zona es una aproximación OHLC, no una orden real. Android puede suspender la supervisión; si falta histórico, se pausa para no inventar operaciones. No garantiza servicio continuo 24/7.",11,MUTED,false);
         add(note,"Capital virtual inicial: "+money(s.optDouble("initial"))+" · Comisión por lado: 0,10 % · Sin apalancamiento",11,MUTED,false);
+        scroll.post(()->scroll.scrollTo(0,priorScroll));
     }
     private void metric(LinearLayout parent,String title,String value,int col){
         TextView t=text(title,11,MUTED,false);parent.addView(t);
