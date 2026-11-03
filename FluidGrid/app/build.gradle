@@ -5,11 +5,11 @@ android {
     compileSdk 35
     defaultConfig {
         // Stable identity for all future versions. Never change between releases.
-        applicationId 'es.fluidgrid.simulator'
+        applicationId 'es.fluidgrid.simulator.preview'
         minSdk 26
         targetSdk 34
         versionCode 11
-        versionName '1.9.0'
+        versionName '1.9.0-preview'
     }
     signingConfigs {
         stable {
