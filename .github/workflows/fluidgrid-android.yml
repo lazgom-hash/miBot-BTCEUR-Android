@@ -1,7 +1,7 @@
 name: FluidGrid Android APK
 on:
   push:
-    branches: [fluidgrid-android]
+    branches: [fluidgrid-android, fluidgrid-1.9-preview]
     paths: ['FluidGrid/**', '.github/workflows/fluidgrid-android.yml']
   pull_request:
     branches: [main]
@@ -60,7 +60,7 @@ jobs:
           path: apksigner.jar
           if-no-files-found: error
       - name: Publicar FluidGrid 1.9.0 con firma permanente
-        if: github.event_name != 'pull_request'
+        if: github.ref == 'refs/heads/fluidgrid-android' && github.event_name != 'pull_request'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
