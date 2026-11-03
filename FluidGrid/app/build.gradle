@@ -4,11 +4,11 @@ android {
     namespace 'es.fluidgrid.app'
     compileSdk 35
     defaultConfig {
-        applicationId 'es.fluidgrid.simulator'
+        applicationId 'es.fluidgrid.simulator.v12'
         minSdk 26
         targetSdk 34
-        versionCode 3
-        versionName '1.1.1'
+        versionCode 4
+        versionName '1.2.0'
     }
     buildTypes { release { minifyEnabled false } }
     compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
