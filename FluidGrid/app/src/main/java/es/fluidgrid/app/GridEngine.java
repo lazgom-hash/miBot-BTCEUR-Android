@@ -60,8 +60,8 @@ public final class GridEngine {
         JSONArray storedHourly=state.optJSONArray("hourlyBarsCache");
         if(storedHourly!=null)for(int i=0;i<storedHourly.length();i++){
             JSONObject b=storedHourly.optJSONObject(i);if(b==null)continue;
-            long t=b.optLong("t",0);double o=b.optDouble("o",0),h=b.optDouble("h",0),l=b.optDouble("l",0),c=b.optDouble("c",0);
-            if(t>0 && l>0 && h>=Math.max(o,c) && l<=Math.min(o,c))recentHourly.add(new Bar(t,o,h,l,c));
+            long t=b.optLong("t",0);double o=b.optDouble("o",0),h=b.optDouble("h",0),lowValue=b.optDouble("l",0),c=b.optDouble("c",0);
+            if(t>0 && lowValue>0 && h>=Math.max(o,c) && lowValue<=Math.min(o,c))recentHourly.add(new Bar(t,o,h,lowValue,c));
         }
         JSONArray cache=state.optJSONArray("zonesCache");
         if(cache!=null)for(int i=0;i<cache.length();i++){JSONObject a=cache.optJSONObject(i);if(a==null)continue;
