@@ -152,7 +152,7 @@ public final class MainActivity extends Activity {
         }
         LinearLayout chart=panel();add(chart,"BTC/USDC · 1H · FLUIDTRADES",13,CYAN,true);
         add(chart,"5/20/5 · ATR 50 · zonas activas confirmadas de OKX",11,MUTED,false);
-        add(chart,"Desliza para ver velas · Pellizca para zoom · Doble toque para volver",10,MUTED,false);
+        add(chart,"Arrastra con un dedo · Pellizca con dos · Doble toque para restablecer",10,MUTED,false);
         chartView.setShowFarZones(showFarZones);
         chartView.setData(s.optJSONArray("hourlyBars"),s.optJSONArray("zones"),s.optJSONArray("trades"),s.optDouble("lastPrice"));
         LinearLayout.LayoutParams cp=new LinearLayout.LayoutParams(-1,dp(355));cp.bottomMargin=dp(5);
@@ -166,6 +166,19 @@ public final class MainActivity extends Activity {
         Button reset=button("Restablecer",0xFF30425A,()->{chartView.resetView();});
         LinearLayout.LayoutParams p1=new LinearLayout.LayoutParams(0,dp(43),2);p1.setMargins(0,0,dp(7),0);
         row.addView(toggle,p1);row.addView(reset,new LinearLayout.LayoutParams(0,dp(43),1));chart.addView(row);
+        LinearLayout zoomRow=new LinearLayout(this);zoomRow.setOrientation(LinearLayout.HORIZONTAL);
+        Button smaller=button("− Alejar",0xFF293E58,()->chartView.zoomOut());
+        Button larger=button("+ Acercar",0xFF1B6177,()->chartView.zoomIn());
+        Button recent=button("Ir a ahora",0xFF176F65,()->chartView.resetView());
+        LinearLayout.LayoutParams controlA=new LinearLayout.LayoutParams(0,dp(45),1);
+        controlA.setMargins(0,dp(7),dp(5),0);
+        LinearLayout.LayoutParams controlB=new LinearLayout.LayoutParams(0,dp(45),1);
+        controlB.setMargins(0,dp(7),dp(5),0);
+        LinearLayout.LayoutParams controlC=new LinearLayout.LayoutParams(0,dp(45),1);
+        controlC.setMargins(0,dp(7),0,0);
+        zoomRow.addView(smaller,controlA);zoomRow.addView(larger,controlB);zoomRow.addView(recent,controlC);
+        chart.addView(zoomRow);
+        add(chart,"Un dedo dentro del gráfico: desplazar velas. Dos dedos: zoom. Para desplazarte por la pantalla, arrastra fuera del gráfico.",10,MUTED,false);
         add(chart,"▲ Compra simulada      ▼ Venta simulada      ┄ Precio actual",10,MUTED,false);
 
         LinearLayout z=panel();add(z,"ZONAS ACTIVAS · 1H · 5/20/5",12,CYAN,true);
