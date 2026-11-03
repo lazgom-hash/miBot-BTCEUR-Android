@@ -78,7 +78,8 @@ public final class MainActivity extends Activity {
         add(body,"◈  FluidGrid",26,WHITE,true);
         add(body,"Versión "+versionName()+" · BTC spot · FluidTrades SMC Lite · 1 hora · simulación",11,MUTED,false);
         LinearLayout hero=panel();
-        String market=s.optString("market","BTC-USDC");add(hero,market+(s.optBoolean("proxy")?" · referencia USD (no USDC)":""),13,CYAN,true);
+        String market=s.optString("market","BTC-USDC");add(hero,"Fuente OKX: "+market+(s.optBoolean("proxy")?" · libro unificado USD/USDC": ""),13,CYAN,true);
+        add(hero,"Para comparar zonas, TradingView debe utilizar datos de OKX y los mismos ajustes (5/20/5).",11,MUTED,false);
         add(hero,s.optDouble("lastPrice")>0?num(s.optDouble("lastPrice"),2)+" USD":"Sin cotización verificada",27,WHITE,true);
         add(hero,s.optString("status","Preparado"),12,s.optBoolean("blocked")||s.optBoolean("stale")?AMBER:MUTED,false);
         if(s.optBoolean("stale")&&s.optBoolean("started"))add(hero,"Aviso: sin cotización reciente verificada. Revisa si Android ha suspendido la supervisión.",11,RED,true);
@@ -140,13 +141,13 @@ public final class MainActivity extends Activity {
             add(a,"El consejo sigue reglas de liquidez. No predice el precio, ni compromete aportaciones reales.",10,MUTED,false);
         }
         LinearLayout chart=panel();add(chart,"GRÁFICO BTC · 1H · FLUIDTRADES",12,CYAN,true);
-        add(chart,"Últimas 72 velas horarias con zonas activas de oferta y demanda.",11,MUTED,false);
+        add(chart,"FluidTrades: swing 5 · historial 20 · anchura 5 · ATR 50. Velas confirmadas OKX.",11,MUTED,false);
         ChartView cv=new ChartView(this);
         cv.setData(s.optJSONArray("hourlyBars"), s.optJSONArray("zones"));
         LinearLayout.LayoutParams cp=new LinearLayout.LayoutParams(-1,dp(240));cp.bottomMargin=dp(8);
         chart.addView(cv,cp);
 
-        LinearLayout z=panel();add(z,"ZONAS ACTIVAS · 1H",12,CYAN,true);
+        LinearLayout z=panel();add(z,"ZONAS ACTIVAS · 1H · 5/20/5",12,CYAN,true);
         JSONArray zones=s.optJSONArray("zones");int count=0;
         if(zones!=null)for(int i=0;i<zones.length();i++){
             JSONObject q=zones.optJSONObject(i);if(q==null)continue;count++;
