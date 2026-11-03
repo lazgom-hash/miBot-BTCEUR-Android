@@ -64,8 +64,8 @@ public final class ChartView extends View {
         marker.setTextAlign(Paint.Align.CENTER);marker.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);marker.setTextSize(dp(9));
         scale=new ScaleGestureDetector(context,new ScaleGestureDetector.SimpleOnScaleGestureListener(){
             @Override public boolean onScale(ScaleGestureDetector d){
-                zoom=Math.max(.7f,Math.min(7f,zoom*d.getScaleFactor()));
-                clampOffset();invalidate();return true;
+                zoomAt(d.getScaleFactor(),d.getFocusX());
+                return true;
             }
         });
         gestures=new GestureDetector(context,new GestureDetector.SimpleOnGestureListener(){
@@ -77,10 +77,26 @@ public final class ChartView extends View {
     public void setShowFarZones(boolean value){showFarZones=value;invalidate();}
     public boolean isShowingFarZones(){return showFarZones;}
     public void resetView(){zoom=1f;offsetBars=0f;invalidate();}
+    public void zoomIn(){zoomAt(1.35f,getWidth()*.60f);}
+    public void zoomOut(){zoomAt(1f/1.35f,getWidth()*.60f);}
+    private void zoomAt(float factor,float focusX){
+        if(candles.isEmpty())return;
+        int oldCount=visibleCount();
+        float left=dp(8),plotWidth=Math.max(dp(80),getWidth()-dp(89));
+        float fraction=Math.max(0,Math.min(1,(focusX-left)/plotWidth));
+        float firstVisible=candles.size()-oldCount-offsetBars;
+        float anchor=firstVisible+fraction*oldCount;
+        zoom=Math.max(.40f,Math.min(8f,zoom*factor));
+        int newCount=visibleCount();
+        offsetBars=candles.size()-newCount-(anchor-fraction*newCount);
+        clampOffset();
+        invalidate();
+    }
     public boolean isInteracting(){return touchActive;}
     public void setData(JSONArray bars,JSONArray zonesJson,JSONArray tradesJson,double price){
+        long oldLast=candles.isEmpty()?0:candles.get(candles.size()-1).t;
         candles.clear();zones.clear();trades.clear();livePrice=price;
-        if(bars!=null)for(int i=Math.max(0,bars.length()-240);i<bars.length();i++){
+        if(bars!=null)for(int i=Math.max(0,bars.length()-720);i<bars.length();i++){
             JSONObject x=bars.optJSONObject(i);if(x==null)continue;
             double o=x.optDouble("o"),h=x.optDouble("h"),l=x.optDouble("l"),cl=x.optDouble("c");
             if(o>0 && h>=l) candles.add(new Candle(x.optLong("t"),o,h,l,cl));
@@ -96,11 +112,15 @@ public final class ChartView extends View {
             if(("COMPRA".equals(type)||"VENTA".equals(type))&&x.optDouble("price")>0)
                 trades.add(new Trade(x.optLong("t"),x.optDouble("price"),"COMPRA".equals(type)));
         }
+        if(offsetBars>0 && oldLast>0 && !candles.isEmpty()){
+            long newLast=candles.get(candles.size()-1).t;
+            if(newLast>oldLast)offsetBars+=(newLast-oldLast)/(float)HOUR;
+        }
         clampOffset();invalidate();
     }
     private int visibleCount(){
         int n=(int)Math.round(48/zoom);
-        return Math.min(candles.size(),Math.max(14,Math.min(95,n)));
+        return Math.min(candles.size(),Math.max(12,Math.min(120,n)));
     }
     private void clampOffset(){
         if(offsetBars<0)offsetBars=0;
@@ -108,28 +128,42 @@ public final class ChartView extends View {
     }
     @Override public boolean onTouchEvent(MotionEvent e){
         if(candles.isEmpty())return super.onTouchEvent(e);
-        gestures.onTouchEvent(e);scale.onTouchEvent(e);
+        // The parent ScrollView must not steal the first swipe. One finger pans the chart.
+        // Scroll the dashboard by dragging OUTSIDE the chart.
+        if(e.getActionMasked()==MotionEvent.ACTION_DOWN){
+            touchActive=true;
+            lastX=e.getX();downX=lastX;downY=e.getY();horizontalDrag=false;
+            if(getParent()!=null)getParent().requestDisallowInterceptTouchEvent(true);
+        }
+        gestures.onTouchEvent(e);
+        scale.onTouchEvent(e);
         switch(e.getActionMasked()){
             case MotionEvent.ACTION_DOWN:
-                downX=e.getX();downY=e.getY();lastX=downX;horizontalDrag=false;touchActive=true;return true;
+                return true;
             case MotionEvent.ACTION_POINTER_DOWN:
-                getParent().requestDisallowInterceptTouchEvent(true);return true;
+                if(getParent()!=null)getParent().requestDisallowInterceptTouchEvent(true);
+                return true;
+            case MotionEvent.ACTION_POINTER_UP:
+                if(e.getPointerCount()>1){
+                    int remaining=e.getActionIndex()==0?1:0;
+                    lastX=e.getX(remaining);
+                }
+                return true;
             case MotionEvent.ACTION_MOVE:
-                if(e.getPointerCount()>1||scale.isInProgress()){
-                    getParent().requestDisallowInterceptTouchEvent(true);return true;
-                }
+                if(e.getPointerCount()>1||scale.isInProgress())return true;
                 float dx=e.getX()-lastX;
-                float totalX=e.getX()-downX,totalY=e.getY()-downY;
-                if(!horizontalDrag && Math.abs(totalX)>dp(8) && Math.abs(totalX)>1.15f*Math.abs(totalY))horizontalDrag=true;
-                if(horizontalDrag){
-                    getParent().requestDisallowInterceptTouchEvent(true);
-                    offsetBars+=dx/Math.max(dp(3),stepPx);clampOffset();invalidate();
-                }
-                lastX=e.getX();return true;
+                offsetBars+=dx/Math.max(dp(3),stepPx);
+                clampOffset();
+                invalidate();
+                lastX=e.getX();
+                return true;
             case MotionEvent.ACTION_CANCEL:
-                horizontalDrag=false;touchActive=false;getParent().requestDisallowInterceptTouchEvent(false);return true;
             case MotionEvent.ACTION_UP:
-                horizontalDrag=false;touchActive=false;getParent().requestDisallowInterceptTouchEvent(false);performClick();return true;
+                touchActive=false;
+                horizontalDrag=false;
+                if(getParent()!=null)getParent().requestDisallowInterceptTouchEvent(false);
+                if(e.getActionMasked()==MotionEvent.ACTION_UP)performClick();
+                return true;
             default:return true;
         }
     }
@@ -158,10 +192,13 @@ public final class ChartView extends View {
         if(candles.isEmpty()){
             label.setColor(TEXT);c.drawText("Esperando velas BTC 1h verificadas de OKX",dp(10),h/2f,label);return;
         }
-        int n=visibleCount(),end=candles.size()-(int)Math.floor(offsetBars);
-        int start=Math.max(0,end-n);end=Math.min(candles.size(),start+n);
+        int n=visibleCount();
+        float visibleFirst=Math.max(0f,candles.size()-n-offsetBars);
+        int start=Math.max(0,(int)Math.floor(visibleFirst));
+        int end=Math.min(candles.size(),(int)Math.ceil(visibleFirst+n));
         if(end<=start)return;
         long firstTime=candles.get(start).t,lastTime=candles.get(end-1).t;
+        stepPx=width/Math.max(1,n);
         double lo=Double.POSITIVE_INFINITY,hi=Double.NEGATIVE_INFINITY;
         for(int i=start;i<end;i++){
             Candle v=candles.get(i);lo=Math.min(lo,v.l);hi=Math.max(hi,v.h);
@@ -192,7 +229,7 @@ public final class ChartView extends View {
         for(Zone z:drawn){
             float yt=y(z.top,hi,span,top,height),yb=y(z.bottom,hi,span,top,height);
             float xs=left;
-            if(z.born>firstTime)xs=left+(float)((z.born-firstTime)/(double)Math.max(HOUR,lastTime-firstTime))*width;
+            if(z.born>firstTime)xs=left+(float)(((z.born-candles.get(0).t)/(double)HOUR-visibleFirst)*stepPx);
             if(xs>=right)continue;
             fill.setColor(z.demand?ZONE_GREEN:ZONE_RED);
             c.drawRect(xs,yt,right,yb,fill);
@@ -206,9 +243,9 @@ public final class ChartView extends View {
             }
         }
         // Candles
-        stepPx=width/Math.max(1,n);float candleW=Math.max(dp(2),Math.min(dp(9),stepPx*.65f));
+        float candleW=Math.max(dp(2),Math.min(dp(9),stepPx*.65f));
         for(int i=start;i<end;i++){
-            Candle bar=candles.get(i);float x=left+stepPx*(i-start+.5f);
+            Candle bar=candles.get(i);float x=left+stepPx*(i-visibleFirst+.5f);
             boolean up=bar.c>=bar.o;
             int color=up?GREEN:RED;
             line.setColor(color);line.setStrokeWidth(dp(1.1f));
@@ -220,16 +257,16 @@ public final class ChartView extends View {
         // Trade markers at their real simulated price and corresponding hourly candle.
         for(Trade tr:trades){
             if(tr.t<firstTime||tr.t>=lastTime+HOUR)continue;
-            int index=(int)((tr.t-firstTime)/HOUR);
-            if(index<0||index>=end-start)continue;
-            float x=left+stepPx*(index+.5f);
+            float index=(tr.t-candles.get(0).t)/(float)HOUR;
+            float x=left+stepPx*(index-visibleFirst+.5f);
+            if(x<left||x>right)continue;
             float yy=y(tr.price,hi,span,top,height)+(tr.buy?dp(10):-dp(10));
             if(yy<top+dp(7)||yy>bottom-dp(7))continue;
             triangle(c,x,yy,tr.buy);
         }
         // Live ticker: dashed price line clipped to chart; badge drawn outside clipping.
         float liveY=y(livePrice,hi,span,top,height);
-        boolean showLive=end==candles.size() && livePrice>0 && liveY>=top && liveY<=bottom;
+        boolean showLive=offsetBars<1f && end==candles.size() && livePrice>0 && liveY>=top && liveY<=bottom;
         if(showLive){accent.setColor(GREEN);c.drawLine(left,liveY,right,liveY,accent);}
         c.restore();
         if(showLive){
