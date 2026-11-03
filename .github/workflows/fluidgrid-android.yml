@@ -34,7 +34,7 @@ jobs:
           path: FluidGrid/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
       - name: Publicar APK descargable sin iniciar sesión
-        if: github.event_name == 'push' && github.ref == 'refs/heads/fluidgrid-android'
+        if: (github.event_name == 'push' && github.ref == 'refs/heads/fluidgrid-android') || (github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'fluidgrid-android' && github.event.pull_request.head.repo.full_name == github.repository)
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
