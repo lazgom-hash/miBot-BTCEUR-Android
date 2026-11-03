@@ -21,6 +21,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -69,16 +70,29 @@ public final class MainActivity extends Activity {
     private String num(double x,int decimals){NumberFormat f=NumberFormat.getNumberInstance(new Locale("es","ES"));f.setMinimumFractionDigits(decimals);f.setMaximumFractionDigits(decimals);return f.format(x);}
     private String money(double x){return num(x,2)+" USDC";}
     private String date(long millis){return millis==0?"—":DateFormat.getDateTimeInstance(DateFormat.SHORT,DateFormat.SHORT,Locale.getDefault()).format(new Date(millis));}
+    private String versionName(){
+        try{return getPackageManager().getPackageInfo(getPackageName(),0).versionName;}catch(Exception e){return "1.x";}
+    }
     private void render(){
         JSONObject s=new GridEngine(this).snapshot();body.removeAllViews();
         add(body,"◈  FluidGrid",26,WHITE,true);
-        add(body,"BTC spot · FluidTrades SMC Lite · 1 hora · simulación",11,MUTED,false);
+        add(body,"Versión "+versionName()+" · BTC spot · FluidTrades SMC Lite · 1 hora · simulación",11,MUTED,false);
         LinearLayout hero=panel();
         String market=s.optString("market","BTC-USDC");add(hero,market+(s.optBoolean("proxy")?" · referencia USD (no USDC)":""),13,CYAN,true);
         add(hero,s.optDouble("lastPrice")>0?num(s.optDouble("lastPrice"),2)+" USD":"Sin cotización verificada",27,WHITE,true);
         add(hero,s.optString("status","Preparado"),12,s.optBoolean("blocked")||s.optBoolean("stale")?AMBER:MUTED,false);
         if(s.optBoolean("stale")&&s.optBoolean("started"))add(hero,"Aviso: sin cotización reciente verificada. Revisa si Android ha suspendido la supervisión.",11,RED,true);
         add(hero,"Última actualización: "+date(s.optLong("lastUpdate")),11,MUTED,false);
+        long now=System.currentTimeMillis();
+        long lastUp=s.optLong("lastUpdate",0);
+        boolean running=s.optBoolean("started") && !s.optBoolean("paused") && !s.optBoolean("blocked");
+        int elapsed=lastUp>0?(int)Math.max(0,Math.min(60,(now-lastUp)/1000)):0;
+        int remaining=lastUp>0?Math.max(0,60-elapsed):60;
+        add(hero,running?"Próxima actualización estimada en ~"+remaining+" s":"Cuenta atrás detenida",11,AMBER,false);
+        ProgressBar pb=new ProgressBar(this,null,android.R.attr.progressBarStyleHorizontal);
+        pb.setMax(60);pb.setProgress(running?elapsed:0);
+        LinearLayout.LayoutParams pbar=new LinearLayout.LayoutParams(-1,dp(10));pbar.bottomMargin=dp(10);
+        hero.addView(pb,pbar);
         LinearLayout buttons=new LinearLayout(this);buttons.setOrientation(LinearLayout.HORIZONTAL);
         boolean started=s.optBoolean("started"),paused=s.optBoolean("paused");
         Button play=button(started&&!paused?"En marcha":"▶ Iniciar / reanudar",0xFF187A8C,()->start());
@@ -125,6 +139,13 @@ public final class MainActivity extends Activity {
             if(advice.optDouble("scenarioTp")>0)metric(a,"TP si se compra otro tramo",num(advice.optDouble("scenarioTp"),2)+" USD",WHITE);
             add(a,"El consejo sigue reglas de liquidez. No predice el precio, ni compromete aportaciones reales.",10,MUTED,false);
         }
+        LinearLayout chart=panel();add(chart,"GRÁFICO BTC · 1H · FLUIDTRADES",12,CYAN,true);
+        add(chart,"Últimas 72 velas horarias con zonas activas de oferta y demanda.",11,MUTED,false);
+        ChartView cv=new ChartView(this);
+        cv.setData(s.optJSONArray("hourlyBars"), s.optJSONArray("zones"));
+        LinearLayout.LayoutParams cp=new LinearLayout.LayoutParams(-1,dp(240));cp.bottomMargin=dp(8);
+        chart.addView(cv,cp);
+
         LinearLayout z=panel();add(z,"ZONAS ACTIVAS · 1H",12,CYAN,true);
         JSONArray zones=s.optJSONArray("zones");int count=0;
         if(zones!=null)for(int i=0;i<zones.length();i++){
