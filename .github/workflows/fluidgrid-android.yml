@@ -52,10 +52,12 @@ jobs:
           name: FluidGrid-debug-APK
           path: FluidGrid/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
+      - name: Copiar herramienta oficial de firma Android
+        run: cp "$ANDROID_HOME/build-tools/35.0.0/lib/apksigner.jar" apksigner.jar
       - uses: actions/upload-artifact@v4
         with:
           name: android-apksigner-tool-v35
-          path: ${{ env.ANDROID_HOME }}/build-tools/35.0.0/lib/apksigner.jar
+          path: apksigner.jar
           if-no-files-found: error
       - name: Publicar únicamente la APK firmada con el certificado permanente
         if: github.event_name != 'workflow_dispatch'
