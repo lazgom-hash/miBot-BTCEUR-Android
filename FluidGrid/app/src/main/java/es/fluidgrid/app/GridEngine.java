@@ -31,6 +31,7 @@ public final class GridEngine {
     private final Set<String> purchased = new HashSet<>(), sold = new HashSet<>();
     private final List<JSONObject> trades = new ArrayList<>();
     private JSONObject state;
+    private final List<Bar> recentHourly = new ArrayList<>();
 
     private static final class Bar {
         long t; double o,h,l,c;
@@ -56,6 +57,12 @@ public final class GridEngine {
         if(p!=null)for(int i=0;i<p.length();i++)purchased.add(p.optString(i));
         if(s!=null)for(int i=0;i<s.length();i++)sold.add(s.optString(i));
         if(l!=null)for(int i=0;i<l.length();i++){JSONObject a=l.optJSONObject(i);if(a!=null)trades.add(a);}
+        JSONArray storedHourly=state.optJSONArray("hourlyBarsCache");
+        if(storedHourly!=null)for(int i=0;i<storedHourly.length();i++){
+            JSONObject b=storedHourly.optJSONObject(i);if(b==null)continue;
+            long t=b.optLong("t",0);double o=b.optDouble("o",0),h=b.optDouble("h",0),l=b.optDouble("l",0),c=b.optDouble("c",0);
+            if(t>0 && l>0 && h>=Math.max(o,c) && l<=Math.min(o,c))recentHourly.add(new Bar(t,o,h,l,c));
+        }
         JSONArray cache=state.optJSONArray("zonesCache");
         if(cache!=null)for(int i=0;i<cache.length();i++){JSONObject a=cache.optJSONObject(i);if(a==null)continue;
             Zone z=new Zone(a.optString("id"),a.optString("type"),a.optDouble("top"),a.optDouble("bottom"),a.optLong("born"));zones.add(z);
@@ -66,6 +73,12 @@ public final class GridEngine {
             JSONArray cache=new JSONArray();long clock=System.currentTimeMillis();
             for(Zone z:zones)if(z.active(clock)&&z.expires==Long.MAX_VALUE)cache.put(z.json());
             state.put("zonesCache",cache).put("zonesCachedAt",clock);
+            JSONArray hourlyCache=new JSONArray();
+            for(Bar b:recentHourly){
+                JSONObject j=new JSONObject();j.put("t",b.t).put("o",b.o).put("h",b.h).put("l",b.l).put("c",b.c);
+                hourlyCache.put(j);
+            }
+            state.put("hourlyBarsCache",hourlyCache);
             JSONArray a=new JSONArray();for(JSONObject x:trades)a.put(x);state.put("trades",a);
             prefs.edit().putString(STATE,state.toString()).apply();}
         catch(Exception ignored){}
@@ -77,6 +90,9 @@ public final class GridEngine {
         if(n-state.optLong("zonesCachedAt",0)<2*HOUR)for(Zone q:zones)if(q.active(n) && q.expires==Long.MAX_VALUE)z.put(q.json());
         try{
             copy.put("zones",z);
+            JSONArray hb=new JSONArray();
+            for(Bar b:recentHourly){JSONObject j=new JSONObject();j.put("t",b.t).put("o",b.o).put("h",b.h).put("l",b.l).put("c",b.c);hb.put(j);}
+            copy.put("hourlyBars",hb);
             double price=state.optDouble("lastPrice",0),btc=state.optDouble("btc",0),cash=state.optDouble("cash",0),cost=state.optDouble("cost",0),fee=state.optDouble("fee",.001);
             double equity=cash+(btc>0?btc*price*(1-fee):0);
             copy.put("equity",equity).put("unrealized",btc*price*(1-fee)-cost)
@@ -271,6 +287,9 @@ public final class GridEngine {
                 for(int i=1;i<hourly.size();i++)if(hourly.get(i).t-hourly.get(i-1).t!=HOUR)
                     throw new IllegalStateException("Faltan horas en el histórico. Se bloquea el cálculo para evitar zonas incorrectas.");
                 createZones(hourly);zonesRefreshed=System.currentTimeMillis();
+                recentHourly.clear();
+                int from=Math.max(0,hourly.size()-120);
+                for(int k=from;k<hourly.size();k++)recentHourly.add(hourly.get(k));
             }
             long last=state.optLong("lastMinute",0),wanted=last==0?System.currentTimeMillis()-20*MINUTE:last;
             if(last>0 && System.currentTimeMillis()-last>MAX_CATCHUP_MINUTES*MINUTE){
