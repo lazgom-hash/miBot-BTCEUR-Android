@@ -1,0 +1,33 @@
+plugins { id 'com.android.application' }
+
+android {
+    namespace 'es.fluidgrid.app'
+    compileSdk 35
+    defaultConfig {
+        // Stable identity for all future versions. Never change between releases.
+        applicationId 'es.fluidgrid.simulator'
+        minSdk 26
+        targetSdk 34
+        versionCode 11
+        versionName '1.9.0'
+    }
+    signingConfigs {
+        stable {
+            if (System.getenv('FLUIDGRID_KEYSTORE_PATH')) {
+                storeFile file(System.getenv('FLUIDGRID_KEYSTORE_PATH'))
+                storePassword System.getenv('FLUIDGRID_STORE_PASS')
+                keyAlias System.getenv('FLUIDGRID_KEY_ALIAS')
+                keyPassword System.getenv('FLUIDGRID_KEY_PASS')
+            }
+        }
+    }
+    buildTypes {
+        debug {
+            if (System.getenv('FLUIDGRID_KEYSTORE_PATH')) {
+                signingConfig signingConfigs.stable
+            }
+        }
+        release { minifyEnabled false }
+    }
+    compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+}
