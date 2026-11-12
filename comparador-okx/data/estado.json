@@ -1,16 +1,16 @@
 {
-  "ultimo_intento_utc": "2026-11-11T23:38:45Z",
+  "ultimo_intento_utc": "2026-11-12T04:13:14Z",
   "estado": "ok",
   "mensaje": "Muestra válida: 2 mercados",
   "tarifa_compra_bps": 10.0,
   "tarifa_venta_bps": 10.0,
   "nota": "Libro BTC-USD unificado en OKX Europa; ejecución simulada taker, no TP real",
   "simbolo_usd": "BTC-USDC",
-  "ultima_muestra_utc": "2026-11-11T23:38:45Z",
-  "muestras_totales": 55,
+  "ultima_muestra_utc": "2026-11-12T04:13:14Z",
+  "muestras_totales": 56,
   "ultima_observacion": {
-    "spread_eur_bps": 0.7667,
-    "spread_usd_bps": 0.0135,
-    "fx": 1.109517
+    "spread_eur_bps": 0.4505,
+    "spread_usd_bps": 0.0136,
+    "fx": 1.107477
   }
 }
